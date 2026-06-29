@@ -194,12 +194,12 @@ function FiltroData({
   onLimpar: () => void;
 }) {
   const inputClasses =
-    "bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#3574b5]";
+    "bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-[#3574b5]";
 
   return (
-    <div className="flex flex-wrap items-end gap-3 mb-4">
+    <div className="flex flex-wrap items-end gap-2 mb-3">
       <div>
-        <label className="block mb-1 text-xs text-[#888888]">De:</label>
+        <label className="block mb-0.5 text-xs text-[#888888]">De:</label>
         <input
           type="date"
           value={inicio}
@@ -208,7 +208,7 @@ function FiltroData({
         />
       </div>
       <div>
-        <label className="block mb-1 text-xs text-[#888888]">Até:</label>
+        <label className="block mb-0.5 text-xs text-[#888888]">Até:</label>
         <input
           type="date"
           value={fim}
@@ -220,7 +220,7 @@ function FiltroData({
         <button
           type="button"
           onClick={onLimpar}
-          className="px-3 py-2 rounded-lg border border-[#2a2a2a] text-sm text-[#888888] hover:text-white hover:border-[#3574b5]"
+          className="px-2 py-1 rounded-lg border border-[#2a2a2a] text-xs text-[#888888] hover:text-white hover:border-[#3574b5]"
         >
           Limpar filtro
         </button>
@@ -492,7 +492,12 @@ export default function DashboardPage() {
                         }
                         className="w-full flex items-center justify-between text-left"
                       >
-                        <span className="text-white">{resposta.nome_completo}</span>
+                        <div>
+                          <span className="text-white block">{resposta.nome_completo}</span>
+                          <span className="text-xs text-gray-500">
+                            {formatarData(resposta.criado_em)}
+                          </span>
+                        </div>
                         <div className="flex items-center gap-2">
                           <span className={`w-2.5 h-2.5 rounded-full ${corScore(score)}`} />
                           <span className="text-sm text-white">{score}/100</span>
@@ -500,29 +505,36 @@ export default function DashboardPage() {
                       </button>
 
                       {expandido && (
-                        <div className="mt-3 pt-3 border-t border-[#2a2a2a] flex flex-col gap-1.5 text-sm text-white">
-                          <p>
-                            ✦ Interesse no curso: {resposta.interesse_curso_completo || "—"} →{" "}
-                            <span className="text-[#3574b5]">
+                        <div className="mt-3 pt-3 border-t border-[#2a2a2a] flex flex-col gap-2 text-sm text-white">
+                          <p className="flex items-center gap-2 flex-wrap">
+                            ✦ Interesse no curso: {resposta.interesse_curso_completo || "—"}
+                            <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
                               {pontosInteresse(resposta)} pontos
                             </span>
                           </p>
-                          <p>
-                            ✦ Renda mensal: {resposta.faixa_renda || "—"} →{" "}
-                            <span className="text-[#3574b5]">{pontosRenda(resposta)} pontos</span>
+                          <p className="flex items-center gap-2 flex-wrap">
+                            ✦ Renda mensal: {resposta.faixa_renda || "—"}
+                            <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
+                              {pontosRenda(resposta)} pontos
+                            </span>
                           </p>
-                          <p>
-                            ✦ Escolaridade: {resposta.escolaridade || "—"} →{" "}
-                            <span className="text-[#3574b5]">
+                          <p className="flex items-center gap-2 flex-wrap">
+                            ✦ Escolaridade: {resposta.escolaridade || "—"}
+                            <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
                               {pontosEscolaridade(resposta)} pontos
                             </span>
                           </p>
-                          <p>
-                            ✦ Faixa etária: {resposta.faixa_etaria || "—"} →{" "}
-                            <span className="text-[#3574b5]">{pontosIdade(resposta)} pontos</span>
+                          <p className="flex items-center gap-2 flex-wrap">
+                            ✦ Faixa etária: {resposta.faixa_etaria || "—"}
+                            <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
+                              {pontosIdade(resposta)} pontos
+                            </span>
                           </p>
-                          <p className="font-medium mt-1">
-                            ✦ Total: <span className="text-[#3574b5]">{score}/100 pontos</span>
+                          <p className="flex items-center gap-2 flex-wrap font-medium mt-1">
+                            ✦ Total:
+                            <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
+                              {score}/100 pontos
+                            </span>
                           </p>
                         </div>
                       )}

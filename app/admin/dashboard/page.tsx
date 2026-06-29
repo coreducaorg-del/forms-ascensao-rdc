@@ -480,7 +480,7 @@ export default function DashboardPage() {
 
             <div>
               <h2 className="text-lg font-bold mb-3">Ranking de Ascensão</h2>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 max-h-72 overflow-y-auto scroll-azul pr-1">
                 {ranking.map(({ resposta, score }) => {
                   const expandido = rankingExpandido === resposta.id;
                   return (
@@ -546,7 +546,7 @@ export default function DashboardPage() {
 
             <div>
               <h2 className="text-lg font-bold mb-3">Interesse no Curso Completo</h2>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 max-h-72 overflow-y-auto scroll-azul pr-1">
                 {respostasComData.map((r) => {
                   const badge =
                     r.interesse_curso_completo === "Sim, com certeza"
@@ -569,11 +569,16 @@ export default function DashboardPage() {
 
             <div>
               <h2 className="text-lg font-bold mb-3">Renda Mensal</h2>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 max-h-72 overflow-y-auto scroll-azul pr-1">
                 {respostasComData.map((r) => (
                   <Card key={r.id} className="p-4 flex items-center justify-between">
                     <span className="text-white">{r.nome_completo}</span>
-                    <span className="text-sm text-[#3574b5]">{r.faixa_renda ?? "—"}</span>
+                    <span
+                      className="text-xs px-3 py-1 rounded-full border border-[#3574b5] text-[#3574b5]"
+                      style={{ backgroundColor: "rgba(53, 116, 181, 0.15)" }}
+                    >
+                      {r.faixa_renda ?? "—"}
+                    </span>
                   </Card>
                 ))}
               </div>
@@ -581,7 +586,7 @@ export default function DashboardPage() {
 
             <div>
               <h2 className="text-lg font-bold mb-3">O que faria investir mais</h2>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 max-h-72 overflow-y-auto scroll-azul pr-1">
                 {respostasComData.map((r) => {
                   const expandido = investirExpandido === r.id;
                   return (

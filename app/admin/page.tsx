@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const USUARIOS_VALIDOS = [
-  { email: "vitorchei.negocios@gmail.com", senha: "rdc@2025" },
-  { email: "coreduca.org@gmail.com", senha: "rdc@2025" },
+  { email: "vitorchei.negocios@gmail.com", senha: "12345678" },
+  { email: "coreduca.org@gmail.com", senha: "12345678" },
 ];
 
 export default function AdminPage() {

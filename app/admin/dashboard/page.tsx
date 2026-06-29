@@ -6,12 +6,10 @@ import {
   PieChart,
   Pie,
   Cell,
-  Sector,
   Tooltip,
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import { supabase } from "@/lib/supabase";
 import type { Resposta } from "@/lib/database.types";
 
@@ -241,9 +239,9 @@ function GraficoPizza({
   return (
     <Card className="p-4">
       <h2 className="font-bold text-white mb-2">{titulo}</h2>
-      <div className="w-full h-64">
+      <div className="w-full h-64" style={{ pointerEvents: "none" }}>
         <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
+          <PieChart style={{ outline: "none", border: "none" }} onClick={undefined}>
             <Pie
               data={dados}
               dataKey="value"
@@ -253,25 +251,13 @@ function GraficoPizza({
               outerRadius={80}
               stroke="none"
               strokeWidth={0}
-              activeShape={(props: PieSectorDataItem) => {
-                const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
-                return (
-                  <Sector
-                    cx={cx}
-                    cy={cy}
-                    innerRadius={innerRadius}
-                    outerRadius={outerRadius}
-                    startAngle={startAngle}
-                    endAngle={endAngle}
-                    fill={fill}
-                    stroke="none"
-                    strokeWidth={0}
-                  />
-                );
-              }}
+              activeShape={null as unknown as undefined}
+              onMouseEnter={undefined}
+              onClick={undefined}
+              {...({ activeIndex: -1 } as Record<string, unknown>)}
             >
               {dados.map((_, index) => (
-                <Cell key={index} fill={CORES_GRAFICO[index % CORES_GRAFICO.length]} />
+                <Cell key={index} fill={CORES_GRAFICO[index % CORES_GRAFICO.length]} stroke="none" strokeWidth={0} />
               ))}
             </Pie>
             <Tooltip

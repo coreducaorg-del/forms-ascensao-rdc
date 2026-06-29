@@ -195,15 +195,24 @@ export default function FormularioPage() {
           <h1 className="text-2xl font-bold text-[#3574b5] mb-4">
             Me conta um pouco mais sobre você!
           </h1>
-          <p className="text-[#1a1a1a] whitespace-pre-line mb-8">
-            {`Oi! Prof. Jae aqui.
-
-Você acabou de dar um passo importante, e antes de começar, quero te conhecer melhor!
-Esse formulário tem perguntas rápidas sobre quem você é, o que te trouxe até aqui e o que você espera aprender com o coreano.
-
-Leva menos de 3 minutos e vai me ajudar a entender se estou entregando o que você realmente preciso, e o que posso melhorar pra te ajudar ainda mais.
-Seja honesto/a nas respostas. Quanto mais real sua resposta, mais eu consigo fazer por você. 🙏`}
-          </p>
+          <div className="text-[#1a1a1a]">
+            <p className="mb-4">Oi! Prof. Jae aqui.</p>
+            <p className="mb-4">
+              Você acabou de dar um passo importante, e antes de começar, quero te conhecer melhor!
+            </p>
+            <p className="mb-4 font-bold">
+              Esse formulário tem perguntas rápidas sobre quem você é, o que te trouxe até aqui e o
+              que você espera aprender com o coreano.
+            </p>
+            <p className="mb-4">
+              Leva menos de 3 minutos e vai me ajudar a entender se estou entregando o que você
+              realmente preciso, e o que posso melhorar pra te ajudar ainda mais.
+            </p>
+            <p className="mb-8 italic">
+              Seja honesto/a nas respostas. Quanto mais real sua resposta, mais eu consigo fazer por
+              você. 🙏
+            </p>
+          </div>
           <button
             type="button"
             onClick={() => setSecao(1)}

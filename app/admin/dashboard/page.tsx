@@ -6,26 +6,26 @@ import {
   PieChart,
   Pie,
   Cell,
+  Sector,
   Tooltip,
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import { supabase } from "@/lib/supabase";
 import type { Resposta } from "@/lib/database.types";
 
 type Aba = "alunas" | "respostas" | "analise";
 
 const CORES_GRAFICO = [
-  "#3574b5",
-  "#ff5252",
-  "#34d399",
-  "#fbbf24",
-  "#a78bfa",
-  "#f472b6",
-  "#60a5fa",
-  "#f87171",
-  "#4ade80",
-  "#facc15",
+  "#3574b5", // azul principal
+  "#ff5252", // vermelho principal
+  "#5a9fd4", // azul claro
+  "#ff8a80", // vermelho claro
+  "#1a4f8a", // azul escuro
+  "#c62828", // vermelho escuro
+  "#7eb3e0", // azul bem claro
+  "#ff6b6b", // vermelho médio
 ];
 
 type PerguntaResposta =
@@ -251,7 +251,24 @@ function GraficoPizza({
               cx="50%"
               cy="50%"
               outerRadius={80}
+              stroke="none"
               strokeWidth={0}
+              activeShape={(props: PieSectorDataItem) => {
+                const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
+                return (
+                  <Sector
+                    cx={cx}
+                    cy={cy}
+                    innerRadius={innerRadius}
+                    outerRadius={outerRadius}
+                    startAngle={startAngle}
+                    endAngle={endAngle}
+                    fill={fill}
+                    stroke="none"
+                    strokeWidth={0}
+                  />
+                );
+              }}
             >
               {dados.map((_, index) => (
                 <Cell key={index} fill={CORES_GRAFICO[index % CORES_GRAFICO.length]} />

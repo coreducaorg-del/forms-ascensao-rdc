@@ -186,6 +186,35 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
   );
 }
 
+function WhatsappPill({
+  whatsapp,
+  copiado,
+  onCopiar,
+}: {
+  whatsapp: string;
+  copiado: boolean;
+  onCopiar: () => void;
+}) {
+  const apenasNumeros = whatsapp.replace(/\D/g, "");
+  const ultimos4 = apenasNumeros.slice(-4);
+
+  return (
+    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-[#2a2a2a]">
+      <span className="text-sm text-gray-400">{whatsapp}</span>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onCopiar();
+        }}
+        className="px-2 py-0.5 text-xs text-[#3574b5] border border-[#3574b5] rounded-full hover:bg-[#3574b5] hover:text-white transition-colors bg-[#1a1a1a]"
+      >
+        {copiado ? "copiado!" : ultimos4}
+      </button>
+    </div>
+  );
+}
+
 function FiltroData({
   inicio,
   fim,
@@ -320,8 +349,17 @@ export default function DashboardPage() {
   const [selecionada, setSelecionada] = useState<Resposta | null>(null);
   const [investirExpandido, setInvestirExpandido] = useState<string | null>(null);
   const [rankingExpandido, setRankingExpandido] = useState<string | null>(null);
+  const [interesseExpandido, setInteresseExpandido] = useState<string | null>(null);
+  const [rendaExpandido, setRendaExpandido] = useState<string | null>(null);
+  const [whatsappCopiado, setWhatsappCopiado] = useState<string | null>(null);
   const [filtroInicio, setFiltroInicio] = useState("");
   const [filtroFim, setFiltroFim] = useState("");
+
+  function copiarWhatsapp(id: string, numero: string) {
+    navigator.clipboard.writeText(numero);
+    setWhatsappCopiado(id);
+    setTimeout(() => setWhatsappCopiado((atual) => (atual === id ? null : atual)), 2000);
+  }
 
   useEffect(() => {
     const ok = sessionStorage.getItem("admin_autenticado") === "true";
@@ -548,6 +586,11 @@ export default function DashboardPage() {
                               {score}/100 pontos
                             </span>
                           </p>
+                          <WhatsappPill
+                            whatsapp={resposta.whatsapp}
+                            copiado={whatsappCopiado === resposta.id}
+                            onCopiar={() => copiarWhatsapp(resposta.id, resposta.whatsapp)}
+                          />
                         </div>
                       )}
                     </Card>
@@ -567,17 +610,32 @@ export default function DashboardPage() {
                       ? "bg-yellow-950 text-yellow-400 border-yellow-800"
                       : "bg-red-950 text-red-400 border-red-800";
 
+                  const expandido = interesseExpandido === r.id;
                   return (
-                    <Card key={r.id} className="p-4 flex items-center justify-between">
-                      <span>
-                        <span className="font-semibold text-white">{r.nome_completo}</span>
-                        <span className="text-xs text-gray-500 ml-2">
-                          ({formatarDataCurta(r.criado_em)})
+                    <Card key={r.id} className="p-4">
+                      <button
+                        type="button"
+                        onClick={() => setInteresseExpandido(expandido ? null : r.id)}
+                        className="w-full flex items-center justify-between text-left"
+                      >
+                        <span>
+                          <span className="font-semibold text-white">{r.nome_completo}</span>
+                          <span className="text-xs text-gray-500 ml-2">
+                            ({formatarDataCurta(r.criado_em)})
+                          </span>
                         </span>
-                      </span>
-                      <span className={`text-xs px-2 py-1 rounded-full border ${badge}`}>
-                        {r.interesse_curso_completo ?? "—"}
-                      </span>
+                        <span className={`text-xs px-2 py-1 rounded-full border ${badge}`}>
+                          {r.interesse_curso_completo ?? "—"}
+                        </span>
+                      </button>
+
+                      {expandido && (
+                        <WhatsappPill
+                          whatsapp={r.whatsapp}
+                          copiado={whatsappCopiado === r.id}
+                          onCopiar={() => copiarWhatsapp(r.id, r.whatsapp)}
+                        />
+                      )}
                     </Card>
                   );
                 })}
@@ -587,22 +645,39 @@ export default function DashboardPage() {
             <div>
               <h2 className="text-lg font-bold mb-3">Renda Mensal</h2>
               <div className="flex flex-col gap-3 max-h-72 overflow-y-auto scroll-azul pr-1">
-                {respostasComData.map((r) => (
-                  <Card key={r.id} className="p-4 flex items-center justify-between">
-                    <span>
-                      <span className="font-semibold text-white">{r.nome_completo}</span>
-                      <span className="text-xs text-gray-500 ml-2">
-                        ({formatarDataCurta(r.criado_em)})
-                      </span>
-                    </span>
-                    <span
-                      className="text-xs px-3 py-1 rounded-full border border-[#3574b5] text-[#3574b5]"
-                      style={{ backgroundColor: "rgba(53, 116, 181, 0.15)" }}
-                    >
-                      {r.faixa_renda ?? "—"}
-                    </span>
-                  </Card>
-                ))}
+                {respostasComData.map((r) => {
+                  const expandido = rendaExpandido === r.id;
+                  return (
+                    <Card key={r.id} className="p-4">
+                      <button
+                        type="button"
+                        onClick={() => setRendaExpandido(expandido ? null : r.id)}
+                        className="w-full flex items-center justify-between text-left"
+                      >
+                        <span>
+                          <span className="font-semibold text-white">{r.nome_completo}</span>
+                          <span className="text-xs text-gray-500 ml-2">
+                            ({formatarDataCurta(r.criado_em)})
+                          </span>
+                        </span>
+                        <span
+                          className="text-xs px-3 py-1 rounded-full border border-[#3574b5] text-[#3574b5]"
+                          style={{ backgroundColor: "rgba(53, 116, 181, 0.15)" }}
+                        >
+                          {r.faixa_renda ?? "—"}
+                        </span>
+                      </button>
+
+                      {expandido && (
+                        <WhatsappPill
+                          whatsapp={r.whatsapp}
+                          copiado={whatsappCopiado === r.id}
+                          onCopiar={() => copiarWhatsapp(r.id, r.whatsapp)}
+                        />
+                      )}
+                    </Card>
+                  );
+                })}
               </div>
             </div>
 
@@ -631,9 +706,16 @@ export default function DashboardPage() {
                         </span>
                       </button>
                       {expandido && (
-                        <p className="mt-3 text-sm text-white border-t border-[#2a2a2a] pt-3">
-                          {r.o_que_faria_investir || "Sem resposta."}
-                        </p>
+                        <>
+                          <p className="mt-3 text-sm text-white border-t border-[#2a2a2a] pt-3">
+                            {r.o_que_faria_investir || "Sem resposta."}
+                          </p>
+                          <WhatsappPill
+                            whatsapp={r.whatsapp}
+                            copiado={whatsappCopiado === r.id}
+                            onCopiar={() => copiarWhatsapp(r.id, r.whatsapp)}
+                          />
+                        </>
                       )}
                     </Card>
                   );

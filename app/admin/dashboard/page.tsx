@@ -28,41 +28,60 @@ const CORES_GRAFICO = [
   "#facc15",
 ];
 
-const PERGUNTAS_MULTIPLA_ESCOLHA: { campo: keyof Resposta; label: string }[] = [
-  { campo: "nivel_coreano", label: "Nível de coreano" },
-  { campo: "faixa_etaria", label: "Faixa etária" },
-  { campo: "estado_civil", label: "Estado civil" },
-  { campo: "tem_filhos", label: "Tem filhos?" },
-  { campo: "tem_netos", label: "Tem netos?" },
-  { campo: "escolaridade", label: "Escolaridade" },
-  { campo: "momento_profissional", label: "Momento profissional" },
-  { campo: "faixa_renda", label: "Faixa de renda" },
-  { campo: "tempo_dedicacao", label: "Tempo de dedicação" },
-  { campo: "interesse_curso_completo", label: "Interesse no curso completo" },
+type PerguntaResposta =
+  | { tipo: "pizza"; campo: keyof Resposta; label: string }
+  | { tipo: "lista"; campo: keyof Resposta; label: string };
+
+const PERGUNTAS_RESPOSTAS: PerguntaResposta[] = [
+  { tipo: "pizza", campo: "nivel_coreano", label: "Qual seu nível de coreano hoje?" },
+  {
+    tipo: "lista",
+    campo: "coreano_no_dia_a_dia",
+    label: "Me conte sobre como o Idioma e a Cultura Coreana faz parte do seu dia a dia",
+  },
+  { tipo: "lista", campo: "motivacao", label: "Por que você decidiu aprender Coreano?" },
+  {
+    tipo: "lista",
+    campo: "maior_dificuldade",
+    label: "Qual é a sua maior dificuldade em aprender o Coreano?",
+  },
+  {
+    tipo: "lista",
+    campo: "tentou_antes",
+    label: "Você já tentou aprender coreano antes? Se sim, o que aconteceu?",
+  },
+  { tipo: "pizza", campo: "faixa_etaria", label: "Qual a sua idade?" },
+  { tipo: "pizza", campo: "estado_civil", label: "Qual seu estado civil?" },
+  { tipo: "pizza", campo: "tem_filhos", label: "Você tem filhos?" },
+  { tipo: "pizza", campo: "tem_netos", label: "Você tem netos?" },
+  { tipo: "pizza", campo: "escolaridade", label: "Qual é seu Grau de Escolaridade?" },
+  { tipo: "pizza", campo: "momento_profissional", label: "Qual é seu momento profissional?" },
+  { tipo: "pizza", campo: "faixa_renda", label: "Qual a faixa da sua renda mensal?" },
+  { tipo: "pizza", campo: "tempo_dedicacao", label: "Quanto tempo por dia você consegue se dedicar?" },
+  {
+    tipo: "pizza",
+    campo: "interesse_curso_completo",
+    label: "Você teria interesse em conhecer um caminho completo?",
+  },
+  {
+    tipo: "lista",
+    campo: "o_que_faria_investir",
+    label: "O que faria você investir mais para aprender coreano de forma completa?",
+  },
 ];
 
-const PERGUNTAS_ABERTAS: { campo: keyof Resposta; label: string }[] = [
-  { campo: "coreano_no_dia_a_dia", label: "Como o coreano faz parte do dia a dia" },
-  { campo: "motivacao", label: "Motivação para aprender coreano" },
-  { campo: "maior_dificuldade", label: "Maior dificuldade" },
-  { campo: "tentou_antes", label: "Já tentou aprender antes" },
-  { campo: "o_que_faria_investir", label: "O que faria investir mais" },
-];
-
-function calculateScore(resposta: Resposta): number {
-  let score = 0;
-
-  switch (resposta.interesse_curso_completo) {
+function pontosInteresse(r: Resposta): number {
+  switch (r.interesse_curso_completo) {
     case "Sim, com certeza":
-      score += 40;
-      break;
+      return 40;
     case "Talvez, dependendo do valor":
-      score += 30;
-      break;
+      return 30;
     default:
-      score += 0;
+      return 0;
   }
+}
 
+function pontosRenda(r: Resposta): number {
   const rendaAlta = [
     "Entre R$ 3.001 e R$ 4.000",
     "Entre R$ 4.001 e R$ 5.000",
@@ -72,43 +91,52 @@ function calculateScore(resposta: Resposta): number {
   ];
   const rendaMedia = ["Entre R$ 1.001 e R$ 2.000", "Entre R$ 2.001 e R$ 3.000"];
 
-  if (resposta.faixa_renda && rendaAlta.includes(resposta.faixa_renda)) {
-    score += 30;
-  } else if (resposta.faixa_renda && rendaMedia.includes(resposta.faixa_renda)) {
-    score += 20;
-  } else if (resposta.faixa_renda === "Menos de R$ 1.000") {
-    score += 5;
-  }
+  if (r.faixa_renda && rendaAlta.includes(r.faixa_renda)) return 30;
+  if (r.faixa_renda && rendaMedia.includes(r.faixa_renda)) return 20;
+  if (r.faixa_renda === "Menos de R$ 1.000") return 5;
+  return 0;
+}
 
+function pontosEscolaridade(r: Resposta): number {
   const escolaridadeAlta = [
     "Ensino Superior Completo",
     "Mestrado ou Doutorado Completo",
     "Ensino Médio Completo",
   ];
 
-  if (resposta.escolaridade && escolaridadeAlta.includes(resposta.escolaridade)) {
-    score += 15;
-  } else if (resposta.escolaridade === "Ensino Fundamental Completo") {
-    score += 5;
-  }
+  if (r.escolaridade && escolaridadeAlta.includes(r.escolaridade)) return 15;
+  if (r.escolaridade === "Ensino Fundamental Completo") return 5;
+  return 0;
+}
 
+function pontosIdade(r: Resposta): number {
   const idadeAlta = ["25-34", "35-44", "45-54", "55-65", "+65"];
 
-  if (resposta.faixa_etaria && idadeAlta.includes(resposta.faixa_etaria)) {
-    score += 15;
-  } else if (resposta.faixa_etaria === "18-24") {
-    score += 10;
-  } else if (resposta.faixa_etaria === "13-17") {
-    score += 5;
-  }
+  if (r.faixa_etaria && idadeAlta.includes(r.faixa_etaria)) return 15;
+  if (r.faixa_etaria === "18-24") return 10;
+  if (r.faixa_etaria === "13-17") return 5;
+  return 0;
+}
 
-  return score;
+function calculateScore(resposta: Resposta): number {
+  return (
+    pontosInteresse(resposta) +
+    pontosRenda(resposta) +
+    pontosEscolaridade(resposta) +
+    pontosIdade(resposta)
+  );
 }
 
 function corScore(score: number): string {
   if (score >= 75) return "bg-green-500";
   if (score >= 40) return "bg-yellow-500";
   return "bg-red-500";
+}
+
+function corScoreHex(score: number): string {
+  if (score >= 75) return "#22c55e";
+  if (score >= 40) return "#eab308";
+  return "#ef4444";
 }
 
 function formatarData(iso: string): string {
@@ -146,8 +174,129 @@ function IconAnalise() {
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 ${className}`}>
+    <div className={`bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl ${className}`}>
       {children}
+    </div>
+  );
+}
+
+function FiltroData({
+  inicio,
+  fim,
+  onInicio,
+  onFim,
+  onLimpar,
+}: {
+  inicio: string;
+  fim: string;
+  onInicio: (v: string) => void;
+  onFim: (v: string) => void;
+  onLimpar: () => void;
+}) {
+  const inputClasses =
+    "bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#3574b5]";
+
+  return (
+    <div className="flex flex-wrap items-end gap-3 mb-4">
+      <div>
+        <label className="block mb-1 text-xs text-[#888888]">De:</label>
+        <input
+          type="date"
+          value={inicio}
+          onChange={(e) => onInicio(e.target.value)}
+          className={inputClasses}
+        />
+      </div>
+      <div>
+        <label className="block mb-1 text-xs text-[#888888]">Até:</label>
+        <input
+          type="date"
+          value={fim}
+          onChange={(e) => onFim(e.target.value)}
+          className={inputClasses}
+        />
+      </div>
+      {(inicio || fim) && (
+        <button
+          type="button"
+          onClick={onLimpar}
+          className="px-3 py-2 rounded-lg border border-[#2a2a2a] text-sm text-[#888888] hover:text-white hover:border-[#3574b5]"
+        >
+          Limpar filtro
+        </button>
+      )}
+    </div>
+  );
+}
+
+function GraficoPizza({
+  titulo,
+  dados,
+}: {
+  titulo: string;
+  dados: { name: string; value: number }[];
+}) {
+  if (dados.length === 0) return null;
+
+  return (
+    <Card className="p-4">
+      <h2 className="font-bold text-white mb-2">{titulo}</h2>
+      <div className="w-full h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={dados}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+              label={(props) => {
+                const { x, y, name, value, textAnchor } = props as {
+                  x: number;
+                  y: number;
+                  name: string;
+                  value: number;
+                  textAnchor: "start" | "middle" | "end";
+                };
+                return (
+                  <text x={x} y={y} fill="#ffffff" textAnchor={textAnchor} fontSize={12}>
+                    {name}: {value}
+                  </text>
+                );
+              }}
+            >
+              {dados.map((_, index) => (
+                <Cell key={index} fill={CORES_GRAFICO[index % CORES_GRAFICO.length]} />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid #2a2a2a" }}
+              itemStyle={{ color: "#ffffff" }}
+              labelStyle={{ color: "#ffffff" }}
+            />
+            <Legend wrapperStyle={{ color: "#ffffff" }} />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
+}
+
+function ListaRespostas({ titulo, respostas }: { titulo: string; respostas: string[] }) {
+  if (respostas.length === 0) return null;
+
+  return (
+    <div>
+      <h2 className="font-bold text-white mb-1">{titulo}</h2>
+      <p className="text-sm text-white mb-3">{respostas.length} respostas</p>
+      <div className="flex flex-col gap-2">
+        {respostas.map((resposta, index) => (
+          <Card key={index} className="p-3 text-white text-sm">
+            {resposta}
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }
@@ -161,6 +310,9 @@ export default function DashboardPage() {
   const [busca, setBusca] = useState("");
   const [selecionada, setSelecionada] = useState<Resposta | null>(null);
   const [investirExpandido, setInvestirExpandido] = useState<string | null>(null);
+  const [rankingExpandido, setRankingExpandido] = useState<string | null>(null);
+  const [filtroInicio, setFiltroInicio] = useState("");
+  const [filtroFim, setFiltroFim] = useState("");
 
   useEffect(() => {
     const ok = sessionStorage.getItem("admin_autenticado") === "true";
@@ -187,20 +339,34 @@ export default function DashboardPage() {
     carregar();
   }, [autenticado]);
 
+  const respostasComData = useMemo(() => {
+    return respostas.filter((r) => {
+      const dataResposta = new Date(r.criado_em);
+      if (filtroInicio && dataResposta < new Date(`${filtroInicio}T00:00:00`)) return false;
+      if (filtroFim && dataResposta > new Date(`${filtroFim}T23:59:59`)) return false;
+      return true;
+    });
+  }, [respostas, filtroInicio, filtroFim]);
+
   const respostasFiltradas = useMemo(() => {
-    if (!busca.trim()) return respostas;
-    return respostas.filter((r) =>
+    if (!busca.trim()) return respostasComData;
+    return respostasComData.filter((r) =>
       r.nome_completo.toLowerCase().includes(busca.toLowerCase())
     );
-  }, [respostas, busca]);
+  }, [respostasComData, busca]);
 
   const ranking = useMemo(
     () =>
-      [...respostas]
+      [...respostasComData]
         .map((r) => ({ resposta: r, score: calculateScore(r) }))
         .sort((a, b) => b.score - a.score),
-    [respostas]
+    [respostasComData]
   );
+
+  function limparFiltroData() {
+    setFiltroInicio("");
+    setFiltroFim("");
+  }
 
   if (!autenticado || carregando) {
     return (
@@ -216,9 +382,17 @@ export default function DashboardPage() {
         {aba === "alunas" && (
           <div>
             <h1 className="text-xl font-bold mb-1">
-              {respostas.length} alunas cadastradas
+              {respostasComData.length} alunas cadastradas
             </h1>
             <p className="text-[#888888] text-sm mb-4">Lista de respostas recebidas</p>
+
+            <FiltroData
+              inicio={filtroInicio}
+              fim={filtroFim}
+              onInicio={setFiltroInicio}
+              onFim={setFiltroFim}
+              onLimpar={limparFiltroData}
+            />
 
             <input
               type="text"
@@ -234,22 +408,20 @@ export default function DashboardPage() {
                 return (
                   <Card
                     key={r.id}
-                    className="cursor-pointer hover:border-[#3574b5] transition-colors"
+                    className="relative cursor-pointer hover:border-[#3574b5] transition-colors py-3 px-4"
                   >
                     <button
                       type="button"
                       onClick={() => setSelecionada(r)}
-                      className="w-full text-left"
+                      className="w-full text-left pr-6"
                     >
                       <p className="font-medium text-white">{r.nome_completo}</p>
-                      <p className="text-sm text-[#888888] mb-2">
-                        {formatarData(r.criado_em)}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2.5 h-2.5 rounded-full ${corScore(score)}`} />
-                        <span className="text-sm text-white">Score: {score}/100</span>
-                      </div>
+                      <p className="text-sm text-[#888888]">{formatarData(r.criado_em)}</p>
                     </button>
+                    <span
+                      className="absolute top-3 right-4 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: corScoreHex(score) }}
+                    />
                   </Card>
                 );
               })}
@@ -263,73 +435,33 @@ export default function DashboardPage() {
 
         {aba === "respostas" && (
           <div>
-            <h1 className="text-xl font-bold mb-4">Respostas</h1>
-
-            <div className="flex flex-col gap-6 mb-8">
-              {PERGUNTAS_MULTIPLA_ESCOLHA.map(({ campo, label }) => {
-                const contagem = new Map<string, number>();
-                respostas.forEach((r) => {
-                  const valor = r[campo] as string | null;
-                  if (!valor) return;
-                  contagem.set(valor, (contagem.get(valor) ?? 0) + 1);
-                });
-                const dados = Array.from(contagem.entries()).map(([name, value]) => ({
-                  name,
-                  value,
-                }));
-
-                if (dados.length === 0) return null;
-
-                return (
-                  <Card key={campo}>
-                    <h2 className="font-medium mb-2">{label}</h2>
-                    <div className="w-full h-64">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={dados}
-                            dataKey="value"
-                            nameKey="name"
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={80}
-                            label={({ name, value }) => `${name}: ${value}`}
-                          >
-                            {dados.map((_, index) => (
-                              <Cell
-                                key={index}
-                                fill={CORES_GRAFICO[index % CORES_GRAFICO.length]}
-                              />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                          <Legend />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
+            <h1 className="text-xl font-bold text-white mb-4">Respostas</h1>
 
             <div className="flex flex-col gap-6">
-              {PERGUNTAS_ABERTAS.map(({ campo, label }) => {
-                const itens = respostas.filter((r) => (r[campo] as string | null)?.trim());
+              {PERGUNTAS_RESPOSTAS.map((pergunta) => {
+                if (pergunta.tipo === "pizza") {
+                  const contagem = new Map<string, number>();
+                  respostas.forEach((r) => {
+                    const valor = r[pergunta.campo] as string | null;
+                    if (!valor) return;
+                    contagem.set(valor, (contagem.get(valor) ?? 0) + 1);
+                  });
+                  const dados = Array.from(contagem.entries()).map(([name, value]) => ({
+                    name,
+                    value,
+                  }));
 
-                if (itens.length === 0) return null;
+                  return (
+                    <GraficoPizza key={pergunta.campo} titulo={pergunta.label} dados={dados} />
+                  );
+                }
+
+                const itens = respostas
+                  .map((r) => (r[pergunta.campo] as string | null)?.trim())
+                  .filter((v): v is string => Boolean(v));
 
                 return (
-                  <Card key={campo}>
-                    <h2 className="font-medium mb-3">{label}</h2>
-                    <div className="flex flex-col gap-3">
-                      {itens.map((r) => (
-                        <div key={r.id} className="border-b border-[#2a2a2a] pb-2 last:border-0 last:pb-0">
-                          <p className="text-sm font-medium text-[#3574b5]">{r.nome_completo}</p>
-                          <p className="text-sm text-white">{r[campo] as string}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
+                  <ListaRespostas key={pergunta.campo} titulo={pergunta.label} respostas={itens} />
                 );
               })}
             </div>
@@ -338,25 +470,72 @@ export default function DashboardPage() {
 
         {aba === "analise" && (
           <div className="flex flex-col gap-8">
+            <FiltroData
+              inicio={filtroInicio}
+              fim={filtroFim}
+              onInicio={setFiltroInicio}
+              onFim={setFiltroFim}
+              onLimpar={limparFiltroData}
+            />
+
             <div>
               <h2 className="text-lg font-bold mb-3">Ranking de Ascensão</h2>
               <div className="flex flex-col gap-3">
-                {ranking.map(({ resposta, score }) => (
-                  <Card key={resposta.id} className="flex items-center justify-between">
-                    <span className="text-white">{resposta.nome_completo}</span>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2.5 h-2.5 rounded-full ${corScore(score)}`} />
-                      <span className="text-sm text-white">{score}/100</span>
-                    </div>
-                  </Card>
-                ))}
+                {ranking.map(({ resposta, score }) => {
+                  const expandido = rankingExpandido === resposta.id;
+                  return (
+                    <Card key={resposta.id} className="p-4">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setRankingExpandido(expandido ? null : resposta.id)
+                        }
+                        className="w-full flex items-center justify-between text-left"
+                      >
+                        <span className="text-white">{resposta.nome_completo}</span>
+                        <div className="flex items-center gap-2">
+                          <span className={`w-2.5 h-2.5 rounded-full ${corScore(score)}`} />
+                          <span className="text-sm text-white">{score}/100</span>
+                        </div>
+                      </button>
+
+                      {expandido && (
+                        <div className="mt-3 pt-3 border-t border-[#2a2a2a] flex flex-col gap-1.5 text-sm text-white">
+                          <p>
+                            ✦ Interesse no curso: {resposta.interesse_curso_completo || "—"} →{" "}
+                            <span className="text-[#3574b5]">
+                              {pontosInteresse(resposta)} pontos
+                            </span>
+                          </p>
+                          <p>
+                            ✦ Renda mensal: {resposta.faixa_renda || "—"} →{" "}
+                            <span className="text-[#3574b5]">{pontosRenda(resposta)} pontos</span>
+                          </p>
+                          <p>
+                            ✦ Escolaridade: {resposta.escolaridade || "—"} →{" "}
+                            <span className="text-[#3574b5]">
+                              {pontosEscolaridade(resposta)} pontos
+                            </span>
+                          </p>
+                          <p>
+                            ✦ Faixa etária: {resposta.faixa_etaria || "—"} →{" "}
+                            <span className="text-[#3574b5]">{pontosIdade(resposta)} pontos</span>
+                          </p>
+                          <p className="font-medium mt-1">
+                            ✦ Total: <span className="text-[#3574b5]">{score}/100 pontos</span>
+                          </p>
+                        </div>
+                      )}
+                    </Card>
+                  );
+                })}
               </div>
             </div>
 
             <div>
               <h2 className="text-lg font-bold mb-3">Interesse no Curso Completo</h2>
               <div className="flex flex-col gap-3">
-                {respostas.map((r) => {
+                {respostasComData.map((r) => {
                   const badge =
                     r.interesse_curso_completo === "Sim, com certeza"
                       ? "bg-green-950 text-green-400 border-green-800"
@@ -365,7 +544,7 @@ export default function DashboardPage() {
                       : "bg-red-950 text-red-400 border-red-800";
 
                   return (
-                    <Card key={r.id} className="flex items-center justify-between">
+                    <Card key={r.id} className="p-4 flex items-center justify-between">
                       <span className="text-white">{r.nome_completo}</span>
                       <span className={`text-xs px-2 py-1 rounded-full border ${badge}`}>
                         {r.interesse_curso_completo ?? "—"}
@@ -379,8 +558,8 @@ export default function DashboardPage() {
             <div>
               <h2 className="text-lg font-bold mb-3">Renda Mensal</h2>
               <div className="flex flex-col gap-3">
-                {respostas.map((r) => (
-                  <Card key={r.id} className="flex items-center justify-between">
+                {respostasComData.map((r) => (
+                  <Card key={r.id} className="p-4 flex items-center justify-between">
                     <span className="text-white">{r.nome_completo}</span>
                     <span className="text-sm text-[#3574b5]">{r.faixa_renda ?? "—"}</span>
                   </Card>
@@ -391,10 +570,10 @@ export default function DashboardPage() {
             <div>
               <h2 className="text-lg font-bold mb-3">O que faria investir mais</h2>
               <div className="flex flex-col gap-3">
-                {respostas.map((r) => {
+                {respostasComData.map((r) => {
                   const expandido = investirExpandido === r.id;
                   return (
-                    <Card key={r.id}>
+                    <Card key={r.id} className="p-4">
                       <button
                         type="button"
                         onClick={() =>

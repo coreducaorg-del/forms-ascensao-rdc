@@ -91,8 +91,37 @@ function ChoiceButtons({
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <label className="block mb-2 font-medium text-[#1a1a1a]">{children}</label>;
+  return (
+    <label className="block mb-2 font-medium text-[#1a1a1a]">
+      <span className="text-[#ff5252] font-bold mr-1">*</span>
+      {children}
+    </label>
+  );
 }
+
+interface Pais {
+  nome: string;
+  sigla: string;
+  bandeira: string;
+  codigo: string;
+}
+
+const PAISES: Pais[] = [
+  { nome: "Brasil", sigla: "BR", bandeira: "🇧🇷", codigo: "+55" },
+  { nome: "Estados Unidos", sigla: "US", bandeira: "🇺🇸", codigo: "+1" },
+  { nome: "Portugal", sigla: "PT", bandeira: "🇵🇹", codigo: "+351" },
+  { nome: "Argentina", sigla: "AR", bandeira: "🇦🇷", codigo: "+54" },
+  { nome: "México", sigla: "MX", bandeira: "🇲🇽", codigo: "+52" },
+  { nome: "Espanha", sigla: "ES", bandeira: "🇪🇸", codigo: "+34" },
+  { nome: "Reino Unido", sigla: "GB", bandeira: "🇬🇧", codigo: "+44" },
+  { nome: "Canadá", sigla: "CA", bandeira: "🇨🇦", codigo: "+1" },
+  { nome: "Itália", sigla: "IT", bandeira: "🇮🇹", codigo: "+39" },
+  { nome: "França", sigla: "FR", bandeira: "🇫🇷", codigo: "+33" },
+  { nome: "Alemanha", sigla: "DE", bandeira: "🇩🇪", codigo: "+49" },
+  { nome: "Japão", sigla: "JP", bandeira: "🇯🇵", codigo: "+81" },
+  { nome: "Coreia do Sul", sigla: "KR", bandeira: "🇰🇷", codigo: "+82" },
+  { nome: "Austrália", sigla: "AU", bandeira: "🇦🇺", codigo: "+61" },
+];
 
 const inputClasses =
   "w-full border border-gray-300 rounded-lg px-3 py-2 text-[#1a1a1a] focus:outline-none focus:border-[#3574b5]";
@@ -112,9 +141,38 @@ export default function FormularioPage() {
   const [enviando, setEnviando] = useState(false);
   const [erroEnvio, setErroEnvio] = useState("");
   const [enviado, setEnviado] = useState(false);
+  const [paisWhatsapp, setPaisWhatsapp] = useState<Pais>(PAISES[0]);
+  const [numeroWhatsapp, setNumeroWhatsapp] = useState("");
 
   function set<K extends keyof FormData>(campo: K, valor: FormData[K]) {
     setFormData((prev) => ({ ...prev, [campo]: valor }));
+  }
+
+  function handleNumeroWhatsappChange(valor: string) {
+    if (paisWhatsapp.codigo === "+55") {
+      const formatado = formatarWhatsapp(valor);
+      setNumeroWhatsapp(formatado);
+      set("whatsapp", `${paisWhatsapp.codigo} ${formatado}`);
+    } else {
+      const numeros = valor.replace(/\D/g, "").slice(0, 15);
+      setNumeroWhatsapp(numeros);
+      set("whatsapp", `${paisWhatsapp.codigo} ${numeros}`);
+    }
+  }
+
+  function handlePaisWhatsappChange(sigla: string) {
+    const pais = PAISES.find((p) => p.sigla === sigla) ?? PAISES[0];
+    setPaisWhatsapp(pais);
+
+    if (pais.codigo === "+55") {
+      const formatado = formatarWhatsapp(numeroWhatsapp);
+      setNumeroWhatsapp(formatado);
+      set("whatsapp", `${pais.codigo} ${formatado}`);
+    } else {
+      const numeros = numeroWhatsapp.replace(/\D/g, "").slice(0, 15);
+      setNumeroWhatsapp(numeros);
+      set("whatsapp", `${pais.codigo} ${numeros}`);
+    }
   }
 
   function validarSecao1(): boolean {
@@ -259,7 +317,7 @@ export default function FormularioPage() {
             <h2 className="text-2xl font-bold text-[#3574b5]">Dados Pessoais</h2>
 
             <div>
-              <Label>Para começar, qual seu nome e sobrenome? *</Label>
+              <Label>Para começar, qual seu nome e sobrenome?</Label>
               <input
                 type="text"
                 value={formData.nome_completo}
@@ -269,18 +327,31 @@ export default function FormularioPage() {
             </div>
 
             <div>
-              <Label>Seu WhatsApp com DDD (DDD + Número) *</Label>
-              <input
-                type="text"
-                value={formData.whatsapp}
-                onChange={(e) => set("whatsapp", formatarWhatsapp(e.target.value))}
-                placeholder="(00) 00000-0000"
-                className={inputClasses}
-              />
+              <Label>Seu WhatsApp com DDD (DDD + Número)</Label>
+              <div className="flex gap-2">
+                <select
+                  value={paisWhatsapp.sigla}
+                  onChange={(e) => handlePaisWhatsappChange(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-2 py-2 text-[#1a1a1a] focus:outline-none focus:border-[#3574b5] bg-white"
+                >
+                  {PAISES.map((pais) => (
+                    <option key={pais.sigla} value={pais.sigla}>
+                      {pais.bandeira} {pais.codigo}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  value={numeroWhatsapp}
+                  onChange={(e) => handleNumeroWhatsappChange(e.target.value)}
+                  placeholder={paisWhatsapp.codigo === "+55" ? "(00) 00000-0000" : "Número"}
+                  className={inputClasses}
+                />
+              </div>
             </div>
 
             <div>
-              <Label>Qual seu melhor email? *</Label>
+              <Label>Qual seu melhor email?</Label>
               <input
                 type="email"
                 value={formData.email}
@@ -296,7 +367,7 @@ export default function FormularioPage() {
             <h2 className="text-2xl font-bold text-[#3574b5]">Sobre você e o Idioma Coreano...</h2>
 
             <div>
-              <Label>Qual seu nível de coreano hoje? *</Label>
+              <Label>Qual seu nível de coreano hoje?</Label>
               <ChoiceButtons
                 options={["Do absoluto zero", "Sei ler o hangul", "Sei algumas frases", "Intermediário", "Sou 100% fluente"]}
                 selected={formData.nivel_coreano}

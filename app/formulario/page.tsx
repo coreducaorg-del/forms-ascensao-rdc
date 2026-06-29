@@ -71,13 +71,13 @@ function ChoiceButtons({
   onSelect: (value: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-col gap-2">
       {options.map((option) => (
         <button
           key={option}
           type="button"
           onClick={() => onSelect(option)}
-          className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+          className={`w-full text-left px-4 py-4 min-h-[52px] rounded-lg border text-sm font-medium transition-colors ${
             selected === option
               ? "bg-[#eef3fb] text-[#3574b5] border-[#3574b5]"
               : "bg-white text-gray-700 border-gray-300 hover:border-[#3574b5]"
@@ -210,7 +210,7 @@ export default function FormularioPage() {
         )}
 
         {secao === 1 && (
-          <div className="space-y-5">
+          <div className="space-y-8">
             <h2 className="text-2xl font-bold text-[#3574b5]">Dados Pessoais</h2>
 
             <div>
@@ -246,7 +246,7 @@ export default function FormularioPage() {
         )}
 
         {secao === 2 && (
-          <div className="space-y-5">
+          <div className="space-y-8">
             <h2 className="text-2xl font-bold text-[#3574b5]">Sobre você e o Idioma Coreano...</h2>
 
             <div>
@@ -309,7 +309,7 @@ export default function FormularioPage() {
         )}
 
         {secao === 3 && (
-          <div className="space-y-5">
+          <div className="space-y-8">
             <h2 className="text-2xl font-bold text-[#3574b5]">Dados Demográficos</h2>
 
             <div>
@@ -442,7 +442,7 @@ export default function FormularioPage() {
         )}
 
         {secao === 4 && (
-          <div className="space-y-5">
+          <div className="space-y-8">
             <h2 className="text-2xl font-bold text-[#3574b5]">Prontidão</h2>
 
             <div>

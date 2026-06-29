@@ -145,6 +145,14 @@ function formatarData(iso: string): string {
   }).format(new Date(iso));
 }
 
+function formatarDataCurta(iso: string): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  }).format(new Date(iso));
+}
+
 function IconAlunas() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
@@ -497,9 +505,9 @@ export default function DashboardPage() {
                         className="w-full flex items-center justify-between text-left"
                       >
                         <div>
-                          <span className="text-white block">{resposta.nome_completo}</span>
-                          <span className="text-xs text-gray-500">
-                            {formatarData(resposta.criado_em)}
+                          <span className="font-semibold text-white">{resposta.nome_completo}</span>
+                          <span className="text-xs text-gray-500 ml-2">
+                            ({formatarDataCurta(resposta.criado_em)})
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -561,7 +569,12 @@ export default function DashboardPage() {
 
                   return (
                     <Card key={r.id} className="p-4 flex items-center justify-between">
-                      <span className="text-white">{r.nome_completo}</span>
+                      <span>
+                        <span className="font-semibold text-white">{r.nome_completo}</span>
+                        <span className="text-xs text-gray-500 ml-2">
+                          ({formatarDataCurta(r.criado_em)})
+                        </span>
+                      </span>
                       <span className={`text-xs px-2 py-1 rounded-full border ${badge}`}>
                         {r.interesse_curso_completo ?? "—"}
                       </span>
@@ -576,7 +589,12 @@ export default function DashboardPage() {
               <div className="flex flex-col gap-3 max-h-72 overflow-y-auto scroll-azul pr-1">
                 {respostasComData.map((r) => (
                   <Card key={r.id} className="p-4 flex items-center justify-between">
-                    <span className="text-white">{r.nome_completo}</span>
+                    <span>
+                      <span className="font-semibold text-white">{r.nome_completo}</span>
+                      <span className="text-xs text-gray-500 ml-2">
+                        ({formatarDataCurta(r.criado_em)})
+                      </span>
+                    </span>
                     <span
                       className="text-xs px-3 py-1 rounded-full border border-[#3574b5] text-[#3574b5]"
                       style={{ backgroundColor: "rgba(53, 116, 181, 0.15)" }}
@@ -602,7 +620,12 @@ export default function DashboardPage() {
                         }
                         className="w-full text-left flex items-center justify-between"
                       >
-                        <span className="text-white">{r.nome_completo}</span>
+                        <span>
+                          <span className="font-semibold text-white">{r.nome_completo}</span>
+                          <span className="text-xs text-gray-500 ml-2">
+                            ({formatarDataCurta(r.criado_em)})
+                          </span>
+                        </span>
                         <span className="text-[#888888] text-sm">
                           {expandido ? "Ocultar" : "Ver resposta"}
                         </span>

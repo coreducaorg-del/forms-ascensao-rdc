@@ -6,10 +6,12 @@ import {
   PieChart,
   Pie,
   Cell,
+  Sector,
   Tooltip,
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import { supabase } from "@/lib/supabase";
 import type { Resposta } from "@/lib/database.types";
 
@@ -239,9 +241,9 @@ function GraficoPizza({
   return (
     <Card className="p-4">
       <h2 className="font-bold text-white mb-2">{titulo}</h2>
-      <div className="w-full h-64" style={{ pointerEvents: "none" }}>
+      <div className="w-full h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <PieChart style={{ outline: "none", border: "none" }} onClick={undefined}>
+          <PieChart style={{ outline: "none", border: "none" }}>
             <Pie
               data={dados}
               dataKey="value"
@@ -251,10 +253,22 @@ function GraficoPizza({
               outerRadius={80}
               stroke="none"
               strokeWidth={0}
-              activeShape={null as unknown as undefined}
-              onMouseEnter={undefined}
-              onClick={undefined}
-              {...({ activeIndex: -1 } as Record<string, unknown>)}
+              activeShape={(props: PieSectorDataItem) => {
+                const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
+                return (
+                  <Sector
+                    cx={cx}
+                    cy={cy}
+                    innerRadius={innerRadius}
+                    outerRadius={(outerRadius ?? 0) + 4}
+                    startAngle={startAngle}
+                    endAngle={endAngle}
+                    fill={fill}
+                    stroke="none"
+                    strokeWidth={0}
+                  />
+                );
+              }}
             >
               {dados.map((_, index) => (
                 <Cell key={index} fill={CORES_GRAFICO[index % CORES_GRAFICO.length]} stroke="none" strokeWidth={0} />
@@ -273,15 +287,25 @@ function GraficoPizza({
   );
 }
 
-function ListaRespostas({ titulo, respostas }: { titulo: string; respostas: string[] }) {
+function ListaRespostas({
+  titulo,
+  respostas,
+}: {
+  titulo: string;
+  respostas: { texto: string; nome: string }[];
+}) {
   return (
     <Card className="p-4">
       <h2 className="font-bold text-white mb-1">{titulo}</h2>
       <p className="text-sm text-[#888888] mb-3">{respostas.length} respostas</p>
       <div className="flex flex-col gap-2 max-h-72 overflow-y-auto scroll-azul pr-1">
         {respostas.map((resposta, index) => (
-          <div key={index} className="bg-[#2a2a2a] text-white text-sm rounded-lg p-3">
-            {resposta}
+          <div
+            key={index}
+            className="flex justify-between items-start gap-4 bg-[#2a2a2a] rounded-lg p-3"
+          >
+            <p className="text-white text-sm flex-1">{resposta.texto}</p>
+            <span className="text-xs text-gray-500 whitespace-nowrap">{resposta.nome}</span>
           </div>
         ))}
       </div>
@@ -445,8 +469,11 @@ export default function DashboardPage() {
                 }
 
                 const itens = respostas
-                  .map((r) => (r[pergunta.campo] as string | null)?.trim())
-                  .filter((v): v is string => Boolean(v));
+                  .map((r) => {
+                    const texto = (r[pergunta.campo] as string | null)?.trim();
+                    return texto ? { texto, nome: r.nome_completo } : null;
+                  })
+                  .filter((v): v is { texto: string; nome: string } => v !== null);
 
                 return (
                   <ListaRespostas key={pergunta.campo} titulo={pergunta.label} respostas={itens} />

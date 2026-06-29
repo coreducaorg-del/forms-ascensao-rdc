@@ -6,12 +6,10 @@ import {
   PieChart,
   Pie,
   Cell,
-  Sector,
   Tooltip,
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import { supabase } from "@/lib/supabase";
 import type { Resposta } from "@/lib/database.types";
 
@@ -253,25 +251,16 @@ function GraficoPizza({
               outerRadius={80}
               stroke="none"
               strokeWidth={0}
-              activeShape={(props: PieSectorDataItem) => {
-                const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
-                return (
-                  <Sector
-                    cx={cx}
-                    cy={cy}
-                    innerRadius={innerRadius}
-                    outerRadius={(outerRadius ?? 0) + 4}
-                    startAngle={startAngle}
-                    endAngle={endAngle}
-                    fill={fill}
-                    stroke="none"
-                    strokeWidth={0}
-                  />
-                );
-              }}
+              isAnimationActive={false}
+              activeShape={false as unknown as undefined}
             >
               {dados.map((_, index) => (
-                <Cell key={index} fill={CORES_GRAFICO[index % CORES_GRAFICO.length]} stroke="none" strokeWidth={0} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={CORES_GRAFICO[index % CORES_GRAFICO.length]}
+                  stroke="none"
+                  strokeWidth={0}
+                />
               ))}
             </Pie>
             <Tooltip

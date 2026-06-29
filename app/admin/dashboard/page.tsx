@@ -251,20 +251,7 @@ function GraficoPizza({
               cx="50%"
               cy="50%"
               outerRadius={80}
-              label={(props) => {
-                const { x, y, name, value, textAnchor } = props as {
-                  x: number;
-                  y: number;
-                  name: string;
-                  value: number;
-                  textAnchor: "start" | "middle" | "end";
-                };
-                return (
-                  <text x={x} y={y} fill="#ffffff" textAnchor={textAnchor} fontSize={12}>
-                    {name}: {value}
-                  </text>
-                );
-              }}
+              strokeWidth={0}
             >
               {dados.map((_, index) => (
                 <Cell key={index} fill={CORES_GRAFICO[index % CORES_GRAFICO.length]} />
@@ -275,7 +262,7 @@ function GraficoPizza({
               itemStyle={{ color: "#ffffff" }}
               labelStyle={{ color: "#ffffff" }}
             />
-            <Legend wrapperStyle={{ color: "#ffffff" }} />
+            <Legend iconType="circle" wrapperStyle={{ color: "#ffffff" }} />
           </PieChart>
         </ResponsiveContainer>
       </div>

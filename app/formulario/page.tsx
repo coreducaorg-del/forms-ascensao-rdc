@@ -184,12 +184,12 @@ export default function FormularioPage() {
     <main className="min-h-screen flex items-start justify-center px-4 py-10" style={gridBackground}>
       <div className="w-full max-w-[600px] bg-white rounded-2xl shadow-lg p-8">
         <div className="mb-6">
-          <p className="text-sm text-[#3574b5] font-bold mb-1">
+          <p className="text-sm text-[#ff5252] font-bold mb-1">
             Seção {secao} de {TOTAL_SECOES}
           </p>
           <div className="w-full bg-[#f0f0f0] rounded-full h-2">
             <div
-              className="bg-[#ff5252] h-2 rounded-full transition-all"
+              className="bg-[#3574b5] h-2 rounded-full transition-all"
               style={{ width: `${(secao / TOTAL_SECOES) * 100}%` }}
             />
           </div>
@@ -211,10 +211,10 @@ export default function FormularioPage() {
 
         {secao === 1 && (
           <div className="space-y-5">
-            <h2 className="text-2xl font-bold text-[#ff5252]">Dados Pessoais</h2>
+            <h2 className="text-2xl font-bold text-[#3574b5]">Dados Pessoais</h2>
 
             <div>
-              <Label>Nome completo *</Label>
+              <Label>Para começar, qual seu nome e sobrenome? *</Label>
               <input
                 type="text"
                 value={formData.nome_completo}
@@ -224,7 +224,7 @@ export default function FormularioPage() {
             </div>
 
             <div>
-              <Label>WhatsApp com DDD *</Label>
+              <Label>Seu WhatsApp com DDD (DDD + Número) *</Label>
               <input
                 type="text"
                 value={formData.whatsapp}
@@ -234,7 +234,7 @@ export default function FormularioPage() {
             </div>
 
             <div>
-              <Label>Melhor email *</Label>
+              <Label>Qual seu melhor email? *</Label>
               <input
                 type="email"
                 value={formData.email}
@@ -247,10 +247,10 @@ export default function FormularioPage() {
 
         {secao === 2 && (
           <div className="space-y-5">
-            <h2 className="text-2xl font-bold text-[#ff5252]">Sobre você e o Idioma Coreano</h2>
+            <h2 className="text-2xl font-bold text-[#3574b5]">Sobre você e o Idioma Coreano...</h2>
 
             <div>
-              <Label>Nível de coreano hoje *</Label>
+              <Label>Qual seu nível de coreano hoje? *</Label>
               <ChoiceButtons
                 options={["Do absoluto zero", "Sei ler o hangul", "Sei algumas frases", "Intermediário", "Sou 100% fluente"]}
                 selected={formData.nivel_coreano}
@@ -259,7 +259,10 @@ export default function FormularioPage() {
             </div>
 
             <div>
-              <Label>Como o idioma e a cultura coreana fazem parte do seu dia a dia</Label>
+              <Label>
+                Me conte sobre como o Idioma e a Cultura Coreana faz parte do seu dia a dia (pode ser
+                bem específica nessa resposta!)
+              </Label>
               <textarea
                 value={formData.coreano_no_dia_a_dia}
                 onChange={(e) => set("coreano_no_dia_a_dia", e.target.value)}
@@ -269,7 +272,10 @@ export default function FormularioPage() {
             </div>
 
             <div>
-              <Label>Por que decidiu aprender coreano</Label>
+              <Label>
+                Por que você decidiu aprender Coreano? Me conte aqui todas as suas motivações! (Abra
+                seu coração nessa resposta! 🫰🏼)
+              </Label>
               <textarea
                 value={formData.motivacao}
                 onChange={(e) => set("motivacao", e.target.value)}
@@ -279,7 +285,9 @@ export default function FormularioPage() {
             </div>
 
             <div>
-              <Label>Maior dificuldade em aprender coreano</Label>
+              <Label>
+                Qual é a sua maior dificuldade em aprender o Coreano? (Abra seu coração mais uma vez)
+              </Label>
               <textarea
                 value={formData.maior_dificuldade}
                 onChange={(e) => set("maior_dificuldade", e.target.value)}
@@ -289,7 +297,7 @@ export default function FormularioPage() {
             </div>
 
             <div>
-              <Label>Já tentou aprender coreano antes? O que aconteceu?</Label>
+              <Label>Você já tentou aprender coreano antes? Se sim, o que aconteceu?</Label>
               <textarea
                 value={formData.tentou_antes}
                 onChange={(e) => set("tentou_antes", e.target.value)}
@@ -302,10 +310,10 @@ export default function FormularioPage() {
 
         {secao === 3 && (
           <div className="space-y-5">
-            <h2 className="text-2xl font-bold text-[#ff5252]">Dados Demográficos</h2>
+            <h2 className="text-2xl font-bold text-[#3574b5]">Dados Demográficos</h2>
 
             <div>
-              <Label>Faixa etária</Label>
+              <Label>Qual a sua idade?</Label>
               <ChoiceButtons
                 options={["13-17", "18-24", "25-34", "35-44", "45-54", "55-65", "+65"]}
                 selected={formData.faixa_etaria}
@@ -314,7 +322,7 @@ export default function FormularioPage() {
             </div>
 
             <div>
-              <Label>Estado civil</Label>
+              <Label>Qual seu estado civil?</Label>
               <ChoiceButtons
                 options={["Solteira(o)", "Namorando", "Casada(o)", "Outro"]}
                 selected={formData.estado_civil}
@@ -332,7 +340,7 @@ export default function FormularioPage() {
             </div>
 
             <div>
-              <Label>Tem filhos?</Label>
+              <Label>Você tem filhos?</Label>
               <ChoiceButtons
                 options={["Sim", "Não"]}
                 selected={formData.tem_filhos}
@@ -343,14 +351,14 @@ export default function FormularioPage() {
                   type="text"
                   value={formData.quantidade_filhos}
                   onChange={(e) => set("quantidade_filhos", e.target.value)}
-                  placeholder="Quantos filhos?"
+                  placeholder="Quantos filhos tem atualmente?"
                   className={`mt-2 ${inputClasses}`}
                 />
               )}
             </div>
 
             <div>
-              <Label>Tem netos?</Label>
+              <Label>E netos?</Label>
               <ChoiceButtons
                 options={["Sim", "Não"]}
                 selected={formData.tem_netos}
@@ -361,14 +369,17 @@ export default function FormularioPage() {
                   type="text"
                   value={formData.quantidade_netos}
                   onChange={(e) => set("quantidade_netos", e.target.value)}
-                  placeholder="Quantos netos?"
+                  placeholder="Quantos netos tem atualmente?"
                   className={`mt-2 ${inputClasses}`}
                 />
               )}
             </div>
 
             <div>
-              <Label>Grau de escolaridade</Label>
+              <Label>
+                Qual é seu Grau de Escolaridade? (Caso você ainda não se formou e esteja fazendo
+                alguma das opções, clique naquela do mesmo jeito)
+              </Label>
               <ChoiceButtons
                 options={[
                   "Não estudei",
@@ -386,14 +397,14 @@ export default function FormularioPage() {
                   type="text"
                   value={formData.area_formacao}
                   onChange={(e) => set("area_formacao", e.target.value)}
-                  placeholder="Qual área se formou?"
+                  placeholder="Qual a área que se formou?"
                   className={`mt-2 ${inputClasses}`}
                 />
               )}
             </div>
 
             <div>
-              <Label>Momento profissional</Label>
+              <Label>Qual é seu momento profissional?</Label>
               <ChoiceButtons
                 options={[
                   "Autônoma(o)",
@@ -410,7 +421,7 @@ export default function FormularioPage() {
             </div>
 
             <div>
-              <Label>Faixa de renda mensal</Label>
+              <Label>Qual a faixa da sua renda mensal?</Label>
               <ChoiceButtons
                 options={[
                   "Sem Renda",
@@ -432,10 +443,10 @@ export default function FormularioPage() {
 
         {secao === 4 && (
           <div className="space-y-5">
-            <h2 className="text-2xl font-bold text-[#ff5252]">Prontidão</h2>
+            <h2 className="text-2xl font-bold text-[#3574b5]">Prontidão</h2>
 
             <div>
-              <Label>Tempo por dia disponível para estudar</Label>
+              <Label>Quanto tempo por dia você consegue se dedicar?</Label>
               <ChoiceButtons
                 options={["Menos de 15 min", "15-30 min", "30-60 min", "Mais de 1h"]}
                 selected={formData.tempo_dedicacao}
@@ -444,7 +455,11 @@ export default function FormularioPage() {
             </div>
 
             <div>
-              <Label>Interesse em curso completo</Label>
+              <Label>
+                Este mini-curso é um ótimo primeiro passo para a fluência.. Mas se existisse um caminho
+                completo, com professor e acompanhamento, pra te levar do zero à fluência.. você teria
+                interesse em conhecer?
+              </Label>
               <ChoiceButtons
                 options={[
                   "Sim, com certeza",
@@ -457,7 +472,10 @@ export default function FormularioPage() {
             </div>
 
             <div>
-              <Label>O que faria você investir mais para aprender coreano de forma completa</Label>
+              <Label>
+                O que faria você investir mais para aprender coreano de forma completa? (o que tem não
+                pode faltar na entrega)
+              </Label>
               <textarea
                 value={formData.o_que_faria_investir}
                 onChange={(e) => set("o_que_faria_investir", e.target.value)}
@@ -474,7 +492,7 @@ export default function FormularioPage() {
               type="button"
               onClick={handleVoltar}
               disabled={enviando}
-              className="px-5 py-2 rounded-xl border border-[#3574b5] text-[#3574b5] font-medium bg-transparent hover:bg-[#eef3fb] disabled:opacity-50"
+              className="px-5 py-2 rounded-xl border border-[#ff5252] text-[#ff5252] font-medium bg-transparent hover:bg-[#fdecec] disabled:opacity-50"
             >
               Voltar
             </button>
@@ -486,7 +504,7 @@ export default function FormularioPage() {
             type="button"
             onClick={handleProximo}
             disabled={enviando}
-            className="px-5 py-2 rounded-xl bg-[#ff5252] text-white font-medium hover:bg-[#e63e3e] disabled:opacity-50"
+            className="px-5 py-2 rounded-xl bg-[#3574b5] text-white font-medium hover:bg-[#2a5c92] disabled:opacity-50"
           >
             {enviando ? "Enviando..." : secao === TOTAL_SECOES ? "Enviar" : "Próximo"}
           </button>

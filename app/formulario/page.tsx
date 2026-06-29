@@ -97,8 +97,16 @@ function Label({ children }: { children: React.ReactNode }) {
 const inputClasses =
   "w-full border border-gray-300 rounded-lg px-3 py-2 text-[#1a1a1a] focus:outline-none focus:border-[#3574b5]";
 
+function formatarWhatsapp(valor: string): string {
+  const numeros = valor.replace(/\D/g, "").slice(0, 11);
+
+  if (numeros.length <= 2) return numeros;
+  if (numeros.length <= 7) return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
+  return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
+}
+
 export default function FormularioPage() {
-  const [secao, setSecao] = useState(1);
+  const [secao, setSecao] = useState(0);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [erros, setErros] = useState<string[]>([]);
   const [enviando, setEnviando] = useState(false);
@@ -180,6 +188,34 @@ export default function FormularioPage() {
     );
   }
 
+  if (secao === 0) {
+    return (
+      <main className="min-h-screen flex items-center justify-center px-4 py-10" style={gridBackground}>
+        <div className="w-full max-w-[600px] bg-white rounded-2xl shadow-lg p-8">
+          <h1 className="text-2xl font-bold text-[#3574b5] mb-4">
+            Me conta um pouco mais sobre você!
+          </h1>
+          <p className="text-[#1a1a1a] whitespace-pre-line mb-8">
+            {`Oi! Prof. Jae aqui.
+
+Você acabou de dar um passo importante, e antes de começar, quero te conhecer melhor!
+Esse formulário tem perguntas rápidas sobre quem você é, o que te trouxe até aqui e o que você espera aprender com o coreano.
+
+Leva menos de 3 minutos e vai me ajudar a entender se estou entregando o que você realmente preciso, e o que posso melhorar pra te ajudar ainda mais.
+Seja honesto/a nas respostas. Quanto mais real sua resposta, mais eu consigo fazer por você. 🙏`}
+          </p>
+          <button
+            type="button"
+            onClick={() => setSecao(1)}
+            className="px-5 py-2 rounded-xl bg-[#3574b5] text-white font-medium hover:bg-[#2a5c92]"
+          >
+            Começar
+          </button>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen flex items-start justify-center px-4 py-10" style={gridBackground}>
       <div className="w-full max-w-[600px] bg-white rounded-2xl shadow-lg p-8">
@@ -228,7 +264,8 @@ export default function FormularioPage() {
               <input
                 type="text"
                 value={formData.whatsapp}
-                onChange={(e) => set("whatsapp", e.target.value)}
+                onChange={(e) => set("whatsapp", formatarWhatsapp(e.target.value))}
+                placeholder="(00) 00000-0000"
                 className={inputClasses}
               />
             </div>

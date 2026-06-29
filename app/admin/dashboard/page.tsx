@@ -284,20 +284,18 @@ function GraficoPizza({
 }
 
 function ListaRespostas({ titulo, respostas }: { titulo: string; respostas: string[] }) {
-  if (respostas.length === 0) return null;
-
   return (
-    <div>
+    <Card className="p-4">
       <h2 className="font-bold text-white mb-1">{titulo}</h2>
-      <p className="text-sm text-white mb-3">{respostas.length} respostas</p>
-      <div className="flex flex-col gap-2">
+      <p className="text-sm text-[#888888] mb-3">{respostas.length} respostas</p>
+      <div className="flex flex-col gap-2 max-h-72 overflow-y-auto scroll-azul pr-1">
         {respostas.map((resposta, index) => (
-          <Card key={index} className="p-3 text-white text-sm">
+          <div key={index} className="bg-[#2a2a2a] text-white text-sm rounded-lg p-3">
             {resposta}
-          </Card>
+          </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }
 

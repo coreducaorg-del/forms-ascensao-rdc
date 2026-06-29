@@ -79,8 +79,8 @@ function ChoiceButtons({
           onClick={() => onSelect(option)}
           className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
             selected === option
-              ? "bg-blue-600 text-white border-blue-600"
-              : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
+              ? "bg-[#eef3fb] text-[#3574b5] border-[#3574b5]"
+              : "bg-white text-gray-700 border-gray-300 hover:border-[#3574b5]"
           }`}
         >
           {option}
@@ -91,8 +91,11 @@ function ChoiceButtons({
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <label className="block mb-2 font-medium text-gray-800">{children}</label>;
+  return <label className="block mb-2 font-medium text-[#1a1a1a]">{children}</label>;
 }
+
+const inputClasses =
+  "w-full border border-gray-300 rounded-lg px-3 py-2 text-[#1a1a1a] focus:outline-none focus:border-[#3574b5]";
 
 export default function FormularioPage() {
   const [secao, setSecao] = useState(1);
@@ -157,12 +160,19 @@ export default function FormularioPage() {
     setEnviado(true);
   }
 
+  const gridBackground = {
+    backgroundColor: "#ffffff",
+    backgroundImage:
+      "linear-gradient(rgba(224, 224, 224, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(224, 224, 224, 0.4) 1px, transparent 1px)",
+    backgroundSize: "32px 32px",
+  };
+
   if (enviado) {
     return (
-      <main className="min-h-screen bg-white flex items-center justify-center px-4">
-        <div className="max-w-md text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">Obrigado por responder!</h1>
-          <p className="text-gray-600">
+      <main className="min-h-screen flex items-center justify-center px-4" style={gridBackground}>
+        <div className="max-w-md w-full text-center bg-white rounded-2xl shadow-lg p-10">
+          <h1 className="text-2xl font-bold text-[#ff5252] mb-3">Obrigado por responder!</h1>
+          <p className="text-gray-500">
             Recebemos suas respostas com sucesso. Em breve entraremos em contato.
           </p>
         </div>
@@ -171,15 +181,15 @@ export default function FormularioPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white flex items-start justify-center px-4 py-10">
-      <div className="w-full max-w-xl">
+    <main className="min-h-screen flex items-start justify-center px-4 py-10" style={gridBackground}>
+      <div className="w-full max-w-[600px] bg-white rounded-2xl shadow-lg p-8">
         <div className="mb-6">
-          <p className="text-sm text-gray-500 mb-1">
+          <p className="text-sm text-[#3574b5] font-bold mb-1">
             Seção {secao} de {TOTAL_SECOES}
           </p>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-[#f0f0f0] rounded-full h-2">
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all"
+              className="bg-[#ff5252] h-2 rounded-full transition-all"
               style={{ width: `${(secao / TOTAL_SECOES) * 100}%` }}
             />
           </div>
@@ -201,7 +211,7 @@ export default function FormularioPage() {
 
         {secao === 1 && (
           <div className="space-y-5">
-            <h2 className="text-xl font-bold text-gray-900">Dados Pessoais</h2>
+            <h2 className="text-2xl font-bold text-[#ff5252]">Dados Pessoais</h2>
 
             <div>
               <Label>Nome completo *</Label>
@@ -209,7 +219,7 @@ export default function FormularioPage() {
                 type="text"
                 value={formData.nome_completo}
                 onChange={(e) => set("nome_completo", e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500"
+                className={inputClasses}
               />
             </div>
 
@@ -219,7 +229,7 @@ export default function FormularioPage() {
                 type="text"
                 value={formData.whatsapp}
                 onChange={(e) => set("whatsapp", e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500"
+                className={inputClasses}
               />
             </div>
 
@@ -229,7 +239,7 @@ export default function FormularioPage() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => set("email", e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500"
+                className={inputClasses}
               />
             </div>
           </div>
@@ -237,7 +247,7 @@ export default function FormularioPage() {
 
         {secao === 2 && (
           <div className="space-y-5">
-            <h2 className="text-xl font-bold text-gray-900">Sobre você e o Idioma Coreano</h2>
+            <h2 className="text-2xl font-bold text-[#ff5252]">Sobre você e o Idioma Coreano</h2>
 
             <div>
               <Label>Nível de coreano hoje *</Label>
@@ -254,7 +264,7 @@ export default function FormularioPage() {
                 value={formData.coreano_no_dia_a_dia}
                 onChange={(e) => set("coreano_no_dia_a_dia", e.target.value)}
                 rows={4}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500"
+                className={inputClasses}
               />
             </div>
 
@@ -264,7 +274,7 @@ export default function FormularioPage() {
                 value={formData.motivacao}
                 onChange={(e) => set("motivacao", e.target.value)}
                 rows={4}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500"
+                className={inputClasses}
               />
             </div>
 
@@ -274,7 +284,7 @@ export default function FormularioPage() {
                 value={formData.maior_dificuldade}
                 onChange={(e) => set("maior_dificuldade", e.target.value)}
                 rows={4}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500"
+                className={inputClasses}
               />
             </div>
 
@@ -284,7 +294,7 @@ export default function FormularioPage() {
                 value={formData.tentou_antes}
                 onChange={(e) => set("tentou_antes", e.target.value)}
                 rows={4}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500"
+                className={inputClasses}
               />
             </div>
           </div>
@@ -292,7 +302,7 @@ export default function FormularioPage() {
 
         {secao === 3 && (
           <div className="space-y-5">
-            <h2 className="text-xl font-bold text-gray-900">Dados Demográficos</h2>
+            <h2 className="text-2xl font-bold text-[#ff5252]">Dados Demográficos</h2>
 
             <div>
               <Label>Faixa etária</Label>
@@ -316,7 +326,7 @@ export default function FormularioPage() {
                   value={formData.estado_civil_outro}
                   onChange={(e) => set("estado_civil_outro", e.target.value)}
                   placeholder="Qual?"
-                  className="mt-2 w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500"
+                  className={`mt-2 ${inputClasses}`}
                 />
               )}
             </div>
@@ -334,7 +344,7 @@ export default function FormularioPage() {
                   value={formData.quantidade_filhos}
                   onChange={(e) => set("quantidade_filhos", e.target.value)}
                   placeholder="Quantos filhos?"
-                  className="mt-2 w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500"
+                  className={`mt-2 ${inputClasses}`}
                 />
               )}
             </div>
@@ -352,7 +362,7 @@ export default function FormularioPage() {
                   value={formData.quantidade_netos}
                   onChange={(e) => set("quantidade_netos", e.target.value)}
                   placeholder="Quantos netos?"
-                  className="mt-2 w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500"
+                  className={`mt-2 ${inputClasses}`}
                 />
               )}
             </div>
@@ -377,7 +387,7 @@ export default function FormularioPage() {
                   value={formData.area_formacao}
                   onChange={(e) => set("area_formacao", e.target.value)}
                   placeholder="Qual área se formou?"
-                  className="mt-2 w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500"
+                  className={`mt-2 ${inputClasses}`}
                 />
               )}
             </div>
@@ -422,7 +432,7 @@ export default function FormularioPage() {
 
         {secao === 4 && (
           <div className="space-y-5">
-            <h2 className="text-xl font-bold text-gray-900">Prontidão</h2>
+            <h2 className="text-2xl font-bold text-[#ff5252]">Prontidão</h2>
 
             <div>
               <Label>Tempo por dia disponível para estudar</Label>
@@ -452,7 +462,7 @@ export default function FormularioPage() {
                 value={formData.o_que_faria_investir}
                 onChange={(e) => set("o_que_faria_investir", e.target.value)}
                 rows={4}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-blue-500"
+                className={inputClasses}
               />
             </div>
           </div>
@@ -464,7 +474,7 @@ export default function FormularioPage() {
               type="button"
               onClick={handleVoltar}
               disabled={enviando}
-              className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 disabled:opacity-50"
+              className="px-5 py-2 rounded-xl border border-[#3574b5] text-[#3574b5] font-medium bg-transparent hover:bg-[#eef3fb] disabled:opacity-50"
             >
               Voltar
             </button>
@@ -476,7 +486,7 @@ export default function FormularioPage() {
             type="button"
             onClick={handleProximo}
             disabled={enviando}
-            className="px-5 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 disabled:opacity-50"
+            className="px-5 py-2 rounded-xl bg-[#ff5252] text-white font-medium hover:bg-[#e63e3e] disabled:opacity-50"
           >
             {enviando ? "Enviando..." : secao === TOTAL_SECOES ? "Enviar" : "Próximo"}
           </button>

@@ -171,6 +171,17 @@ export default function AulaPage() {
 
   return (
     <>
+      {/* Preloads recomendados pelo Panda Video — hoistados automaticamente para <head> pelo Next.js App Router */}
+      <link rel="dns-prefetch" href="https://player-vz-52703098-ed8.tv.pandavideo.com.br" />
+      <link rel="dns-prefetch" href="https://b-vz-52703098-ed8.tv.pandavideo.com.br" />
+      <link rel="preload" href="https://player-vz-52703098-ed8.tv.pandavideo.com.br/embed/css/plyr.css" as="style" />
+      <link rel="preload" href="https://player-vz-52703098-ed8.tv.pandavideo.com.br/embed/css/styles.css" as="style" />
+      <link rel="preload" href="https://player-vz-52703098-ed8.tv.pandavideo.com.br/embed/css/pb.css" as="style" />
+      <link rel="preload" href="https://config.tv.pandavideo.com.br/vz-52703098-ed8/816cb247-c817-47eb-9a62-5744964d92c5.json" as="fetch" crossOrigin="anonymous" />
+      <link rel="preload" href="https://config.tv.pandavideo.com.br/vz-52703098-ed8/config.json" as="fetch" crossOrigin="anonymous" />
+      <link rel="preload" href="https://b-vz-52703098-ed8.tv.pandavideo.com.br/816cb247-c817-47eb-9a62-5744964d92c5/playlist.m3u8" as="fetch" crossOrigin="anonymous" />
+      <link rel="prerender" href="https://player-vz-52703098-ed8.tv.pandavideo.com.br/embed/?v=816cb247-c817-47eb-9a62-5744964d92c5" />
+
       <Script
         src="https://player.pandavideo.com.br/api.v2.js"
         strategy="afterInteractive"

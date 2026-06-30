@@ -208,9 +208,28 @@ function FormularioConteudo() {
     return novosErros.length === 0;
   }
 
+  function validarSecao3(): boolean {
+    const novosErros: string[] = [];
+    if (formData.tem_filhos === "Sim" && !formData.quantidade_filhos.trim())
+      novosErros.push("Informe quantos filhos você tem.");
+    if (formData.tem_netos === "Sim" && !formData.quantidade_netos.trim())
+      novosErros.push("Informe quantos netos você tem.");
+    if (
+      (formData.escolaridade === "Ensino Superior Completo" ||
+        formData.escolaridade === "Mestrado ou Doutorado Completo") &&
+      !formData.area_formacao.trim()
+    )
+      novosErros.push("Informe a área em que se formou.");
+    if (formData.estado_civil === "Outro" && !formData.estado_civil_outro.trim())
+      novosErros.push("Informe seu estado civil.");
+    setErros(novosErros);
+    return novosErros.length === 0;
+  }
+
   async function handleProximo() {
     if (secao === 1 && !validarSecao1()) return;
     if (secao === 2 && !validarSecao2()) return;
+    if (secao === 3 && !validarSecao3()) return;
 
     if (secao < TOTAL_SECOES) {
       setSecao(secao + 1);

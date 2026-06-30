@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     if (errorUpdate) throw errorUpdate;
 
     return NextResponse.json({ success: true, email: emailNormalizado, liberado: true });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json(
       { success: false, error: "Ocorreu um erro. Tente novamente em alguns instantes." },
       { status: 500 }

@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       valido,
       diasRestantes: valido ? diasRestantes : 0,
     });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json(
       { success: false, error: "Ocorreu um erro. Tente novamente." },
       { status: 500 }

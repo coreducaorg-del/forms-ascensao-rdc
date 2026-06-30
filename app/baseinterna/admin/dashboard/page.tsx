@@ -252,7 +252,9 @@ export default function BaseInternaAdminDashboard() {
 
       const agora = new Date();
 
-      const resultado: AlunaAcesso[] = (result.data ?? []).map((item: any) => {
+      type AcessoCombinado = AcessoAula & Partial<Resposta>;
+
+      const resultado: AlunaAcesso[] = (result.data as AcessoCombinado[] ?? []).map((item) => {
         const acesso: AcessoAula = {
           id: item.id,
           email: item.email,

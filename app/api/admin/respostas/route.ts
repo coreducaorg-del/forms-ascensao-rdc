@@ -13,9 +13,9 @@ export async function GET() {
     console.log("Total de respostas encontradas:", data?.length);
 
     return NextResponse.json({ success: true, data });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: error instanceof Error ? error.message : "Erro desconhecido" },
       { status: 500 }
     );
   }

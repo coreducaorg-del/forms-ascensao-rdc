@@ -157,6 +157,10 @@ function FormularioConteudo() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [secao]);
+
   function set<K extends keyof FormData>(campo: K, valor: FormData[K]) {
     setFormData((prev) => ({ ...prev, [campo]: valor }));
   }

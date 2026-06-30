@@ -10,7 +10,6 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { supabase } from "@/lib/supabase";
 import type { Resposta } from "@/lib/database.types";
 
 type Aba = "alunas" | "respostas" | "analise";
@@ -374,13 +373,22 @@ export default function DashboardPage() {
     if (!autenticado) return;
 
     async function carregar() {
-      const { data } = await supabase
-        .from("respostas")
-        .select("*")
-        .order("criado_em", { ascending: false });
+      try {
+        const response = await fetch("/api/admin/respostas");
+        const result = await response.json();
 
-      setRespostas(data ?? []);
-      setCarregando(false);
+        if (result.success) {
+          setRespostas(result.data ?? []);
+        } else {
+          console.error("Erro ao buscar respostas:", result.error);
+          setRespostas([]);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar respostas:", error);
+        setRespostas([]);
+      } finally {
+        setCarregando(false);
+      }
     }
 
     carregar();

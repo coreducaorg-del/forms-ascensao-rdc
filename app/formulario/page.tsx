@@ -204,24 +204,44 @@ function FormularioConteudo() {
   function validarSecao2(): boolean {
     const novosErros: string[] = [];
     if (!formData.nivel_coreano) novosErros.push("Selecione seu nível de coreano.");
+    if (!formData.coreano_no_dia_a_dia.trim()) novosErros.push("Conte como o coreano faz parte do seu dia a dia.");
+    if (!formData.motivacao.trim()) novosErros.push("Conte suas motivações para aprender coreano.");
+    if (!formData.maior_dificuldade.trim()) novosErros.push("Conte sua maior dificuldade em aprender coreano.");
+    if (!formData.tentou_antes.trim()) novosErros.push("Responda se já tentou aprender coreano antes.");
     setErros(novosErros);
     return novosErros.length === 0;
   }
 
   function validarSecao3(): boolean {
     const novosErros: string[] = [];
+    if (!formData.faixa_etaria) novosErros.push("Selecione sua faixa etária.");
+    if (!formData.estado_civil) novosErros.push("Selecione seu estado civil.");
+    if (formData.estado_civil === "Outro" && !formData.estado_civil_outro.trim())
+      novosErros.push("Informe seu estado civil.");
+    if (!formData.tem_filhos) novosErros.push("Responda se você tem filhos.");
     if (formData.tem_filhos === "Sim" && !formData.quantidade_filhos.trim())
       novosErros.push("Informe quantos filhos você tem.");
+    if (!formData.tem_netos) novosErros.push("Responda se você tem netos.");
     if (formData.tem_netos === "Sim" && !formData.quantidade_netos.trim())
       novosErros.push("Informe quantos netos você tem.");
+    if (!formData.escolaridade) novosErros.push("Selecione seu grau de escolaridade.");
     if (
       (formData.escolaridade === "Ensino Superior Completo" ||
         formData.escolaridade === "Mestrado ou Doutorado Completo") &&
       !formData.area_formacao.trim()
     )
       novosErros.push("Informe a área em que se formou.");
-    if (formData.estado_civil === "Outro" && !formData.estado_civil_outro.trim())
-      novosErros.push("Informe seu estado civil.");
+    if (!formData.momento_profissional) novosErros.push("Selecione seu momento profissional.");
+    if (!formData.faixa_renda) novosErros.push("Selecione sua faixa de renda mensal.");
+    setErros(novosErros);
+    return novosErros.length === 0;
+  }
+
+  function validarSecao4(): boolean {
+    const novosErros: string[] = [];
+    if (!formData.tempo_dedicacao) novosErros.push("Selecione quanto tempo por dia você consegue se dedicar.");
+    if (!formData.interesse_curso_completo) novosErros.push("Selecione seu interesse em um curso completo.");
+    if (!formData.o_que_faria_investir.trim()) novosErros.push("Conte o que faria você investir mais para aprender coreano.");
     setErros(novosErros);
     return novosErros.length === 0;
   }
@@ -230,6 +250,7 @@ function FormularioConteudo() {
     if (secao === 1 && !validarSecao1()) return;
     if (secao === 2 && !validarSecao2()) return;
     if (secao === 3 && !validarSecao3()) return;
+    if (secao === 4 && !validarSecao4()) return;
 
     if (secao < TOTAL_SECOES) {
       setSecao(secao + 1);

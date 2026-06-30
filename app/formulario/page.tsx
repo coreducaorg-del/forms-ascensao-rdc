@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 interface FormData {
@@ -134,7 +135,8 @@ function formatarWhatsapp(valor: string): string {
   return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
 }
 
-export default function FormularioPage() {
+function FormularioConteudo() {
+  const searchParams = useSearchParams();
   const [secao, setSecao] = useState(0);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [erros, setErros] = useState<string[]>([]);
@@ -143,6 +145,17 @@ export default function FormularioPage() {
   const [enviado, setEnviado] = useState(false);
   const [paisWhatsapp, setPaisWhatsapp] = useState<Pais>(PAISES[0]);
   const [numeroWhatsapp, setNumeroWhatsapp] = useState("");
+  const [veioDaBaseInterna, setVeioDaBaseInterna] = useState(false);
+  const [emailCopiado, setEmailCopiado] = useState(false);
+
+  useEffect(() => {
+    const source = searchParams.get("utm_source");
+    const medium = searchParams.get("utm_medium");
+    const campaign = searchParams.get("utm_campaign");
+    if (source === "ascensao" && medium === "base" && campaign === "interna") {
+      setVeioDaBaseInterna(true);
+    }
+  }, [searchParams]);
 
   function set<K extends keyof FormData>(campo: K, valor: FormData[K]) {
     setFormData((prev) => ({ ...prev, [campo]: valor }));
@@ -232,6 +245,51 @@ export default function FormularioPage() {
       "linear-gradient(rgba(224, 224, 224, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(224, 224, 224, 0.4) 1px, transparent 1px)",
     backgroundSize: "32px 32px",
   };
+
+  if (enviado && veioDaBaseInterna) {
+    return (
+      <main className="min-h-screen flex items-center justify-center px-4" style={gridBackground}>
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8">
+          <h1 className="text-2xl font-bold text-[#3574b5] mb-4">Aulão liberado! 🎉</h1>
+          <p className="text-[#1a1a1a] mb-5">
+            Para acessar, copie o seu e-mail abaixo e cole na próxima página de login, que o acesso
+            será concedido
+          </p>
+
+          <div className="flex items-center gap-2 mb-6">
+            <div className="flex-1 bg-gray-100 rounded-lg px-4 py-3 text-[#1a1a1a] text-sm font-mono break-all">
+              {formData.email}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(formData.email);
+                setEmailCopiado(true);
+                setTimeout(() => setEmailCopiado(false), 2000);
+              }}
+              className="shrink-0 px-4 py-3 rounded-lg bg-[#3574b5] text-white text-sm font-medium hover:bg-[#2a5c92] transition-colors"
+            >
+              {emailCopiado ? "copiado!" : "Copiar email"}
+            </button>
+          </div>
+
+          <p className="text-sm text-[#ff5252] font-semibold mb-6">
+            ATENÇÃO - Você terá acesso ao Aulão por 7 dias a partir do momento que fizer login.
+            Aproveite esse tempo para assistir com atenção!
+          </p>
+
+          <a
+            href="https://aulaocoreano.online/baseinterna"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full text-center px-5 py-4 rounded-xl bg-[#3574b5] text-white font-bold text-lg hover:bg-[#2a5c92] transition-colors"
+          >
+            Acessar o Aulão
+          </a>
+        </div>
+      </main>
+    );
+  }
 
   if (enviado) {
     return (
@@ -628,5 +686,13 @@ export default function FormularioPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function FormularioPage() {
+  return (
+    <Suspense>
+      <FormularioConteudo />
+    </Suspense>
   );
 }

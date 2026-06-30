@@ -13,8 +13,6 @@ declare global {
       options: { onReady: () => void }
     ) => {
       loadWindowScreen: (opts: { panda_id_player: string }) => void;
-      getCurrentTime: () => Promise<number>;
-      onTimeUpdate: (cb: (data: { currentTime: number }) => void) => void;
     };
   }
 }
@@ -70,34 +68,34 @@ export default function AulaPage() {
   useEffect(() => {
     if (carregando || expirado) return;
 
+    // O Panda Player envia eventos via postMessage para o window pai.
+    // O evento correto para monitorar o tempo de reprodução é "panda_timeupdate".
+    // Referência: https://docs.pandavideo.com/reference/receive-events
+    function handleMessage(event: MessageEvent) {
+      const { data } = event;
+      if (data?.message === "panda_timeupdate") {
+        const tempoAtual: number = data.currentTime ?? 0;
+        console.log("Tempo atual do vídeo:", tempoAtual);
+        if (tempoAtual >= TEMPO_LIMITE_SEGUNDOS) {
+          setMostrarBotoes(true);
+        }
+      }
+    }
+
+    window.addEventListener("message", handleMessage);
+
     window.pandascripttag = window.pandascripttag || [];
     window.pandascripttag.push(function () {
       const p = new window.PandaPlayer(PANDA_PLAYER_ID, {
         onReady() {
           p.loadWindowScreen({ panda_id_player: PANDA_PLAYER_ID });
-
-          // Abordagem primária: polling via getCurrentTime() a cada segundo.
-          // getCurrentTime() retorna uma Promise com o tempo atual do vídeo em segundos.
-          // Alternativa caso não funcione: p.onTimeUpdate((data) => { if (data.currentTime >= TEMPO_LIMITE_SEGUNDOS) setMostrarBotoes(true); })
-          const intervalo = setInterval(() => {
-            p.getCurrentTime().then((tempoAtual: number) => {
-              if (tempoAtual >= TEMPO_LIMITE_SEGUNDOS) {
-                setMostrarBotoes(true);
-                clearInterval(intervalo);
-              }
-            }).catch(() => {
-              // Se getCurrentTime não for suportado, cair no evento nativo
-              clearInterval(intervalo);
-              p.onTimeUpdate((data: { currentTime: number }) => {
-                if (data.currentTime >= TEMPO_LIMITE_SEGUNDOS) {
-                  setMostrarBotoes(true);
-                }
-              });
-            });
-          }, 1000);
         },
       });
     });
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
   }, [carregando, expirado]);
 
   if (carregando) {

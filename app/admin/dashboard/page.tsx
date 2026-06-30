@@ -377,8 +377,6 @@ export default function DashboardPage() {
         const response = await fetch("/api/admin/respostas");
         const result = await response.json();
 
-        console.log("Resultado da API:", result);
-
         if (result.success) {
           setRespostas(result.data ?? []);
         } else {

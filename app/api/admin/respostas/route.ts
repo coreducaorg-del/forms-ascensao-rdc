@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
@@ -9,8 +11,6 @@ export async function GET() {
       .order("criado_em", { ascending: false });
 
     if (error) throw error;
-
-    console.log("Total de respostas encontradas:", data?.length);
 
     return NextResponse.json({ success: true, data });
   } catch (error: unknown) {

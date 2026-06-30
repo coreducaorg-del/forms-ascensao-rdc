@@ -244,9 +244,6 @@ export default function BaseInternaAdminDashboard() {
       const response = await fetch("/api/admin/acessos");
       const result = await response.json();
 
-      console.log("Resultado da API acessos:", result);
-      console.log("Total de registros:", result.data?.length);
-
       if (!result.success) {
         console.error("Erro ao buscar acessos:", result.error);
         setCarregando(false);
@@ -286,7 +283,6 @@ export default function BaseInternaAdminDashboard() {
         return { acesso, resposta, score, dias_restantes };
       });
 
-      console.log("Dados processados:", resultado);
       setAlunas(resultado);
     } catch (error) {
       console.error("Erro ao buscar acessos:", error);

@@ -16,16 +16,11 @@ export async function POST(request: NextRequest) {
 
     const emailNormalizado = email.toLowerCase().trim();
 
-    console.log("Email recebido:", JSON.stringify(email));
-    console.log("Email normalizado:", JSON.stringify(emailNormalizado));
-
     const { data: resposta, error: errorResposta } = await supabaseAdmin
       .from("respostas")
       .select("email, nome_completo")
       .ilike("email", emailNormalizado)
       .single();
-
-    console.log("Resultado busca respostas:", JSON.stringify({ resposta, errorResposta }));
 
     if (errorResposta || !resposta) {
       return NextResponse.json(
@@ -43,8 +38,6 @@ export async function POST(request: NextRequest) {
       .select("*")
       .ilike("email", emailNormalizado)
       .single();
-
-    console.log("Resultado busca acessos:", JSON.stringify({ acessoExistente }));
 
     const agora = new Date();
 

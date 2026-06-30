@@ -97,6 +97,32 @@ export interface Database {
           o_que_faria_investir?: string | null;
         };
       };
+      acessos_aula: {
+        Row: {
+          id: string;
+          email: string;
+          primeiro_acesso: string;
+          data_expiracao: string | null;
+          total_acessos: number;
+          ultimo_acesso: string;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          primeiro_acesso?: string;
+          data_expiracao?: string | null;
+          total_acessos?: number;
+          ultimo_acesso?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          primeiro_acesso?: string;
+          data_expiracao?: string | null;
+          total_acessos?: number;
+          ultimo_acesso?: string;
+        };
+      };
     };
   };
 }
@@ -104,3 +130,7 @@ export interface Database {
 export type Resposta = Database["public"]["Tables"]["respostas"]["Row"];
 export type RespostaInsert = Database["public"]["Tables"]["respostas"]["Insert"];
 export type RespostaUpdate = Database["public"]["Tables"]["respostas"]["Update"];
+
+export type AcessoAula = Database["public"]["Tables"]["acessos_aula"]["Row"];
+export type AcessoAulaInsert = Database["public"]["Tables"]["acessos_aula"]["Insert"];
+export type AcessoAulaUpdate = Database["public"]["Tables"]["acessos_aula"]["Update"];

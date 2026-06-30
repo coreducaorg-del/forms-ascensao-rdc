@@ -112,6 +112,20 @@ export default function AulaPage() {
       }
     }, 5000);
 
+    // Android: ao voltar de segundo plano (aba minimizada), o postMessage pode
+    // não ter disparado enquanto o app estava suspenso. Verifica o sessionStorage
+    // ao retornar para garantir que os botões apareçam se o limite já foi atingido.
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        const tempoSalvo = Number(sessionStorage.getItem("video_tempo_maximo") || 0);
+        if (tempoSalvo >= TEMPO_LIMITE_SEGUNDOS) {
+          setMostrarBotoes(true);
+        }
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     window.pandascripttag = window.pandascripttag || [];
     window.pandascripttag.push(function () {
       const p = new window.PandaPlayer(PANDA_PLAYER_ID, {
@@ -123,6 +137,7 @@ export default function AulaPage() {
 
     return () => {
       window.removeEventListener("message", handleMessage);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       clearInterval(verificacaoExtra);
     };
   }, [carregando, expirado]);
@@ -173,11 +188,12 @@ export default function AulaPage() {
             Aulão Coreano na Hora 🇰🇷
           </h1>
 
-          {/* Player */}
-          <div style={{ position: "relative", paddingTop: "56.25%" }}>
+          {/* Player — overflow-hidden evita extravasamento em telas estreitas Android */}
+          <div style={{ position: "relative", paddingTop: "56.25%", overflow: "hidden" }}>
+            {/* autoplay=0 previne tentativa de autoplay com som no Android Chrome */}
             <iframe
               id={PANDA_PLAYER_ID}
-              src="https://player-vz-52703098-ed8.tv.pandavideo.com.br/embed/?v=816cb247-c817-47eb-9a62-5744964d92c5&iosFakeFullscreen=true"
+              src="https://player-vz-52703098-ed8.tv.pandavideo.com.br/embed/?v=816cb247-c817-47eb-9a62-5744964d92c5&iosFakeFullscreen=true&autoplay=0"
               style={{ border: "none", position: "absolute", top: 0, left: 0 }}
               allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
               allowFullScreen
@@ -197,7 +213,7 @@ export default function AulaPage() {
                   href="https://pay.hub.la/L6tGmnOPKY3P3mzgptq2"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center min-h-[44px] px-8 py-4 rounded-xl bg-[#22c55e] text-white font-bold text-sm sm:text-base hover:bg-[#16a34a] transition-colors w-full sm:w-auto"
+                  className="flex items-center justify-center min-h-[44px] px-8 py-4 rounded-xl bg-[#22c55e] text-white font-bold text-sm sm:text-base hover:bg-[#16a34a] transition-colors w-full sm:w-auto touch-manipulation"
                 >
                   Quero o plano de 2 anos
                 </a>
@@ -205,7 +221,7 @@ export default function AulaPage() {
                   href="https://pay.hub.la/AVB4X3lgxwWW2nouZgV8"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center min-h-[44px] px-8 py-4 rounded-xl bg-[#22c55e] text-white font-bold text-sm sm:text-base hover:bg-[#16a34a] transition-colors w-full sm:w-auto"
+                  className="flex items-center justify-center min-h-[44px] px-8 py-4 rounded-xl bg-[#22c55e] text-white font-bold text-sm sm:text-base hover:bg-[#16a34a] transition-colors w-full sm:w-auto touch-manipulation"
                 >
                   Quero o plano de 1 ano
                 </a>

@@ -283,7 +283,7 @@ function FormularioConteudo() {
           </p>
 
           <a
-            href="https://aulaocoreano.online/baseinterna"
+            href="https://www.aulaodecoreano.online/baseinterna"
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full text-center px-5 py-4 rounded-xl bg-[#3574b5] text-white font-bold text-lg hover:bg-[#2a5c92] transition-colors"

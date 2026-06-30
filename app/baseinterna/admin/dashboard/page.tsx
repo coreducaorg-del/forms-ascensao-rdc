@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 import type { Resposta } from "@/lib/database.types";
 import type { AcessoAula } from "@/lib/database.types";
 
@@ -241,43 +240,53 @@ export default function BaseInternaAdminDashboard() {
   }, [router]);
 
   async function carregarDados() {
-    const { data: acessos, error: erroAcessos } = await supabase
-      .from("acessos_aula")
-      .select("*")
-      .order("primeiro_acesso", { ascending: false });
+    try {
+      const response = await fetch("/api/admin/acessos");
+      const result = await response.json();
 
-    if (erroAcessos || !acessos) {
-      setCarregando(false);
-      return;
-    }
-
-    const emails = acessos.map((a) => a.email);
-
-    const { data: respostas } = await supabase
-      .from("respostas")
-      .select("email,nome_completo,whatsapp,interesse_curso_completo,faixa_renda,escolaridade,faixa_etaria")
-      .in("email", emails);
-
-    const respostasPorEmail: Record<string, Resposta> = {};
-    if (respostas) {
-      for (const r of respostas) {
-        respostasPorEmail[r.email.toLowerCase()] = r as Resposta;
+      if (!result.success) {
+        console.error("Erro ao buscar acessos:", result.error);
+        setCarregando(false);
+        return;
       }
+
+      const agora = new Date();
+
+      const resultado: AlunaAcesso[] = (result.data ?? []).map((item: any) => {
+        const acesso: AcessoAula = {
+          id: item.id,
+          email: item.email,
+          primeiro_acesso: item.primeiro_acesso,
+          data_expiracao: item.data_expiracao,
+          total_acessos: item.total_acessos,
+          ultimo_acesso: item.ultimo_acesso,
+        };
+
+        const resposta: Resposta | null = item.nome_completo
+          ? {
+              email: item.email,
+              nome_completo: item.nome_completo,
+              whatsapp: item.whatsapp,
+              interesse_curso_completo: item.interesse_curso_completo,
+              faixa_renda: item.faixa_renda,
+              escolaridade: item.escolaridade,
+              faixa_etaria: item.faixa_etaria,
+            } as Resposta
+          : null;
+
+        const score = resposta ? calculateScore(resposta) : 0;
+        const expiracao = new Date(acesso.data_expiracao ?? agora);
+        const diffMs = expiracao.getTime() - agora.getTime();
+        const dias_restantes = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+        return { acesso, resposta, score, dias_restantes };
+      });
+
+      setAlunas(resultado);
+    } catch (error) {
+      console.error("Erro ao buscar acessos:", error);
+    } finally {
+      setCarregando(false);
     }
-
-    const agora = new Date();
-
-    const resultado: AlunaAcesso[] = acessos.map((acesso) => {
-      const resposta = respostasPorEmail[acesso.email.toLowerCase()] ?? null;
-      const score = resposta ? calculateScore(resposta) : 0;
-      const expiracao = new Date(acesso.data_expiracao);
-      const diffMs = expiracao.getTime() - agora.getTime();
-      const dias_restantes = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      return { acesso, resposta, score, dias_restantes };
-    });
-
-    setAlunas(resultado);
-    setCarregando(false);
   }
 
   function copiarWhatsapp(id: string, numero: string) {

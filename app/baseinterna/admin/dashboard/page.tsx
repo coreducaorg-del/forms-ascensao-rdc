@@ -146,10 +146,15 @@ function CardAcesso({
         </div>
       )}
 
-      {mostrarWhatsapp && expandido && whatsapp && (
-        <div className="mt-2">
-          <p className="text-xs" style={{ color: "#888888" }}>{whatsapp}</p>
-          <WhatsappPill whatsapp={whatsapp} copiado={copiado} onCopiar={onCopiar} />
+      {mostrarWhatsapp && expandido && (
+        <div className="flex flex-col gap-1 mt-2 pt-2 border-t border-[#2a2a2a]">
+          <span className="text-sm text-white">{aluna.acesso.email}</span>
+          {whatsapp && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-gray-400">{whatsapp}</span>
+              <WhatsappPill whatsapp={whatsapp} copiado={copiado} onCopiar={onCopiar} />
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -350,11 +355,11 @@ export default function BaseInternaAdminDashboard() {
                     <CardAcesso
                       key={aluna.acesso.id}
                       aluna={aluna}
-                      copiado={false}
-                      onCopiar={() => {}}
-                      expandido={false}
-                      onToggle={() => {}}
-                      mostrarWhatsapp={false}
+                      copiado={copiado === aluna.acesso.id}
+                      onCopiar={() => copiarWhatsapp(aluna.acesso.id, aluna.resposta?.whatsapp ?? "")}
+                      expandido={expandido === aluna.acesso.id}
+                      onToggle={() => toggleExpandido(aluna.acesso.id)}
+                      mostrarWhatsapp
                     />
                   ))
                 )}

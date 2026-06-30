@@ -10,6 +10,8 @@ export async function GET() {
 
     if (error) throw error;
 
+    console.log("Total de respostas encontradas:", data?.length);
+
     return NextResponse.json({ success: true, data });
   } catch (error: any) {
     return NextResponse.json(

@@ -217,7 +217,7 @@ export default function AulaPage() {
           {mostrarBotoes && (
             <div className="mt-12 text-center">
               <h2 className="text-xl font-bold text-[#1a1a1a] mb-6">
-                Gostou do Aulão? Garanta sua vaga na Ascensão!
+                Gostou do Aulão? Garanta sua vaga no curso Dominando o Coreano!
               </h2>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a

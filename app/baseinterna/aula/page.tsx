@@ -195,9 +195,12 @@ export default function AulaPage() {
       <main className="min-h-screen bg-white py-10 px-4">
         <div className="max-w-[900px] mx-auto">
           {/* Título */}
-          <h1 className="text-3xl font-bold text-[#1a1a1a] text-center mb-8">
-            Aulão Coreano na Hora 🇰🇷
+          <h1 className="text-3xl font-bold text-[#1a1a1a] text-center mb-2">
+            Aulão mais completo de coreano DO ZERO para iniciantes
           </h1>
+          <p className="text-base text-center mb-8" style={{ color: "#666666" }}>
+            Assista do início ao fim para melhor aprendizado
+          </p>
 
           {/* Player — overflow-hidden evita extravasamento em telas estreitas Android */}
           <div style={{ position: "relative", paddingTop: "56.25%", overflow: "hidden" }}>

@@ -8,21 +8,26 @@ import { supabase } from "@/lib/supabase";
 declare global {
   interface Window {
     pandascripttag: unknown[];
-    PandaPlayer: new (id: string, options: { onReady: () => void }) => {
+    PandaPlayer: new (
+      id: string,
+      options: { onReady: () => void }
+    ) => {
       loadWindowScreen: (opts: { panda_id_player: string }) => void;
+      getCurrentTime: () => Promise<number>;
+      onTimeUpdate: (cb: (data: { currentTime: number }) => void) => void;
     };
   }
 }
 
 const PANDA_PLAYER_ID = "panda-816cb247-c817-47eb-9a62-5744964d92c5";
-const CHECKOUT_DELAY_MS = 4234 * 1000;
+const TEMPO_LIMITE_SEGUNDOS = 4234; // 1h 10m 34s
 
 export default function AulaPage() {
   const router = useRouter();
   const [diasRestantes, setDiasRestantes] = useState<number | null>(null);
   const [expirado, setExpirado] = useState(false);
   const [carregando, setCarregando] = useState(true);
-  const [mostrarCheckout, setMostrarCheckout] = useState(false);
+  const [mostrarBotoes, setMostrarBotoes] = useState(false);
 
   useEffect(() => {
     async function verificarAcesso() {
@@ -65,21 +70,31 @@ export default function AulaPage() {
   useEffect(() => {
     if (carregando || expirado) return;
 
-    const timer = setTimeout(() => {
-      setMostrarCheckout(true);
-    }, CHECKOUT_DELAY_MS);
-
-    return () => clearTimeout(timer);
-  }, [carregando, expirado]);
-
-  useEffect(() => {
-    if (carregando || expirado) return;
-
     window.pandascripttag = window.pandascripttag || [];
     window.pandascripttag.push(function () {
       const p = new window.PandaPlayer(PANDA_PLAYER_ID, {
         onReady() {
           p.loadWindowScreen({ panda_id_player: PANDA_PLAYER_ID });
+
+          // Abordagem primária: polling via getCurrentTime() a cada segundo.
+          // getCurrentTime() retorna uma Promise com o tempo atual do vídeo em segundos.
+          // Alternativa caso não funcione: p.onTimeUpdate((data) => { if (data.currentTime >= TEMPO_LIMITE_SEGUNDOS) setMostrarBotoes(true); })
+          const intervalo = setInterval(() => {
+            p.getCurrentTime().then((tempoAtual: number) => {
+              if (tempoAtual >= TEMPO_LIMITE_SEGUNDOS) {
+                setMostrarBotoes(true);
+                clearInterval(intervalo);
+              }
+            }).catch(() => {
+              // Se getCurrentTime não for suportado, cair no evento nativo
+              clearInterval(intervalo);
+              p.onTimeUpdate((data: { currentTime: number }) => {
+                if (data.currentTime >= TEMPO_LIMITE_SEGUNDOS) {
+                  setMostrarBotoes(true);
+                }
+              });
+            });
+          }, 1000);
         },
       });
     });
@@ -144,8 +159,8 @@ export default function AulaPage() {
             />
           </div>
 
-          {/* Botões de checkout — aparecem após 4234s */}
-          {mostrarCheckout && (
+          {/* Botões de checkout — aparecem quando vídeo atinge 4234s */}
+          {mostrarBotoes && (
             <div className="mt-12 text-center">
               <h2 className="text-xl font-bold text-[#1a1a1a] mb-6">
                 Gostou do Aulão? Garanta sua vaga na Ascensão!

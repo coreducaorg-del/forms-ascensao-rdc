@@ -65,6 +65,15 @@ export default function AulaPage() {
     verificarAcesso();
   }, [router]);
 
+  // Ao carregar, verificar se a pessoa já assistiu o suficiente em uma sessão anterior
+  useEffect(() => {
+    if (carregando || expirado) return;
+    const tempoSalvo = Number(sessionStorage.getItem("video_tempo_maximo") || 0);
+    if (tempoSalvo >= TEMPO_LIMITE_SEGUNDOS) {
+      setMostrarBotoes(true);
+    }
+  }, [carregando, expirado]);
+
   useEffect(() => {
     if (carregando || expirado) return;
 
@@ -72,10 +81,19 @@ export default function AulaPage() {
     // O evento correto para monitorar o tempo de reprodução é "panda_timeupdate".
     // Referência: https://docs.pandavideo.com/reference/receive-events
     function handleMessage(event: MessageEvent) {
+      // Processar apenas mensagens originadas do domínio do Panda Video
+      if (!event.origin.includes("pandavideo.com.br")) return;
+
       const { data } = event;
       if (data?.message === "panda_timeupdate") {
         const tempoAtual: number = data.currentTime ?? 0;
-        console.log("Tempo atual do vídeo:", tempoAtual);
+
+        // Persistir apenas o maior tempo já atingido (proteção contra recarregamento)
+        const tempoSalvo = Number(sessionStorage.getItem("video_tempo_maximo") || 0);
+        if (tempoAtual > tempoSalvo) {
+          sessionStorage.setItem("video_tempo_maximo", String(tempoAtual));
+        }
+
         if (tempoAtual >= TEMPO_LIMITE_SEGUNDOS) {
           setMostrarBotoes(true);
         }
@@ -83,6 +101,16 @@ export default function AulaPage() {
     }
 
     window.addEventListener("message", handleMessage);
+
+    // Fallback: verificar sessionStorage a cada 5s para cobrir casos onde
+    // o evento postMessage não dispara (rede instável, reload, etc.)
+    const verificacaoExtra = setInterval(() => {
+      const tempoSalvo = Number(sessionStorage.getItem("video_tempo_maximo") || 0);
+      if (tempoSalvo >= TEMPO_LIMITE_SEGUNDOS) {
+        setMostrarBotoes(true);
+        clearInterval(verificacaoExtra);
+      }
+    }, 5000);
 
     window.pandascripttag = window.pandascripttag || [];
     window.pandascripttag.push(function () {
@@ -95,6 +123,7 @@ export default function AulaPage() {
 
     return () => {
       window.removeEventListener("message", handleMessage);
+      clearInterval(verificacaoExtra);
     };
   }, [carregando, expirado]);
 
@@ -168,7 +197,7 @@ export default function AulaPage() {
                   href="https://pay.hub.la/L6tGmnOPKY3P3mzgptq2"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-8 py-4 rounded-xl bg-[#22c55e] text-white font-bold text-base hover:bg-[#16a34a] transition-colors"
+                  className="flex items-center justify-center min-h-[44px] px-8 py-4 rounded-xl bg-[#22c55e] text-white font-bold text-sm sm:text-base hover:bg-[#16a34a] transition-colors w-full sm:w-auto"
                 >
                   Quero o plano de 2 anos
                 </a>
@@ -176,7 +205,7 @@ export default function AulaPage() {
                   href="https://pay.hub.la/AVB4X3lgxwWW2nouZgV8"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-8 py-4 rounded-xl bg-[#22c55e] text-white font-bold text-base hover:bg-[#16a34a] transition-colors"
+                  className="flex items-center justify-center min-h-[44px] px-8 py-4 rounded-xl bg-[#22c55e] text-white font-bold text-sm sm:text-base hover:bg-[#16a34a] transition-colors w-full sm:w-auto"
                 >
                   Quero o plano de 1 ano
                 </a>

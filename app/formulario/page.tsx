@@ -124,8 +124,6 @@ const PAISES: Pais[] = [
   { nome: "Austrália", sigla: "AU", bandeira: "🇦🇺", codigo: "+61" },
 ];
 
-const inputClasses =
-  "w-full border border-gray-300 rounded-lg px-3 py-2 text-[#1a1a1a] focus:outline-none focus:border-[#3574b5]";
 
 function formatarWhatsapp(valor: string): string {
   const numeros = valor.replace(/\D/g, "").slice(0, 11);

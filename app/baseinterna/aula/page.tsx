@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
-import { supabase } from "@/lib/supabase";
 
 declare global {
   interface Window {
@@ -36,30 +35,26 @@ export default function AulaPage() {
         return;
       }
 
-      const { data: acesso, error } = await supabase
-        .from("acessos_aula")
-        .select("data_expiracao")
-        .eq("email", emailSalvo)
-        .maybeSingle();
+      try {
+        const response = await fetch("/api/baseinterna/verificar-acesso", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: emailSalvo }),
+        });
 
-      if (error || !acesso) {
-        router.replace("/baseinterna");
-        return;
-      }
+        const result = await response.json();
 
-      const agora = new Date();
-      const expiracao = new Date(acesso.data_expiracao);
+        if (!result.success || !result.valido) {
+          setExpirado(true);
+          setCarregando(false);
+          return;
+        }
 
-      if (agora > expiracao) {
-        setExpirado(true);
+        setDiasRestantes(result.diasRestantes);
         setCarregando(false);
-        return;
+      } catch {
+        router.replace("/baseinterna");
       }
-
-      const diffMs = expiracao.getTime() - agora.getTime();
-      const dias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      setDiasRestantes(dias);
-      setCarregando(false);
     }
 
     verificarAcesso();

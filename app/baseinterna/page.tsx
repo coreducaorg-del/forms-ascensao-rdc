@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 
 const gridBackground = {
   backgroundColor: "#ffffff",
@@ -29,91 +28,27 @@ export default function BaseInternaLoginPage() {
 
     setCarregando(true);
 
-    // PASSO A: verificar se email existe na tabela respostas
-    const { data: resposta, error: erroRespostas } = await supabase
-      .from("respostas")
-      .select("email")
-      .ilike("email", emailNormalizado)
-      .maybeSingle();
+    try {
+      const response = await fetch("/api/baseinterna/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailNormalizado }),
+      });
 
-    if (erroRespostas) {
-      setErro("Ocorreu um erro. Tente novamente em alguns instantes.");
-      setCarregando(false);
-      return;
-    }
+      const result = await response.json();
 
-    if (!resposta) {
-      setErro("E-mail não encontrado. Verifique se digitou o e-mail correto que você usou no formulário.");
-      setCarregando(false);
-      return;
-    }
-
-    // PASSO B: verificar/criar registro em acessos_aula
-    const { data: acesso, error: erroAcesso } = await supabase
-      .from("acessos_aula")
-      .select("*")
-      .eq("email", emailNormalizado)
-      .maybeSingle();
-
-    if (erroAcesso) {
-      setErro("Ocorreu um erro. Tente novamente em alguns instantes.");
-      setCarregando(false);
-      return;
-    }
-
-    if (!acesso) {
-      // Primeiro acesso: criar registro com expiração em 7 dias
-      const agora = new Date();
-      const expiracao = new Date(agora.getTime() + 7 * 24 * 60 * 60 * 1000);
-
-      const { error: erroInsert } = await supabase.from("acessos_aula").insert([
-        {
-          email: emailNormalizado,
-          primeiro_acesso: agora.toISOString(),
-          data_expiracao: expiracao.toISOString(),
-          total_acessos: 1,
-          ultimo_acesso: agora.toISOString(),
-        },
-      ]);
-
-      if (erroInsert) {
-        setErro("Ocorreu um erro. Tente novamente em alguns instantes.");
-        setCarregando(false);
+      if (result.success) {
+        sessionStorage.setItem("email_aulao", result.email);
+        router.push("/baseinterna/aula");
         return;
       }
 
-      sessionStorage.setItem("email_aulao", emailNormalizado);
-      router.push("/baseinterna/aula");
-      return;
-    }
-
-    // Registro existente: verificar prazo
-    const agora = new Date();
-    const expiracao = new Date(acesso.data_expiracao);
-
-    if (agora > expiracao) {
-      setErro("Seu acesso ao Aulão expirou. Entre em contato conosco para mais informações.");
+      setErro(result.error || "Ocorreu um erro. Tente novamente em alguns instantes.");
       setCarregando(false);
-      return;
-    }
-
-    // Dentro do prazo: atualizar ultimo_acesso e total_acessos
-    const { error: erroUpdate } = await supabase
-      .from("acessos_aula")
-      .update({
-        ultimo_acesso: agora.toISOString(),
-        total_acessos: acesso.total_acessos + 1,
-      })
-      .eq("email", emailNormalizado);
-
-    if (erroUpdate) {
+    } catch {
       setErro("Ocorreu um erro. Tente novamente em alguns instantes.");
       setCarregando(false);
-      return;
     }
-
-    sessionStorage.setItem("email_aulao", emailNormalizado);
-    router.push("/baseinterna/aula");
   }
 
   return (

@@ -9,7 +9,8 @@ export async function GET() {
   try {
     const { data: acessos, error: errorAcessos } = await supabaseAdmin
       .from("acessos_aula")
-      .select("*");
+      .select("*")
+      .order("primeiro_acesso", { ascending: false });
 
     if (errorAcessos) throw errorAcessos;
 

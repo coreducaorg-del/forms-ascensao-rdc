@@ -360,6 +360,9 @@ export default function BaseInternaAdminDashboard() {
             {/* ABA: Acessos */}
             {aba === "acessos" && (
               <div className="space-y-3">
+                <p className="text-sm text-[#888888] mb-1">
+                  <span className="text-white font-medium">{alunasFiltradas.length}</span> alunas acessaram o Aulão
+                </p>
                 {alunasFiltradas.length === 0 ? (
                   <p className="text-sm text-center mt-8" style={{ color: "#888888" }}>Nenhum resultado encontrado.</p>
                 ) : (

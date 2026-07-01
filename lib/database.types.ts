@@ -35,6 +35,8 @@ export interface Database {
           tempo_dedicacao: string | null;
           interesse_curso_completo: string | null;
           o_que_faria_investir: string | null;
+          tempo_conhece_jae: string | null;
+          como_conheceu_jae: string | null;
         };
         Insert: {
           id?: string;
@@ -65,6 +67,8 @@ export interface Database {
           tempo_dedicacao?: string | null;
           interesse_curso_completo?: string | null;
           o_que_faria_investir?: string | null;
+          tempo_conhece_jae?: string | null;
+          como_conheceu_jae?: string | null;
         };
         Update: {
           id?: string;
@@ -95,6 +99,8 @@ export interface Database {
           tempo_dedicacao?: string | null;
           interesse_curso_completo?: string | null;
           o_que_faria_investir?: string | null;
+          tempo_conhece_jae?: string | null;
+          como_conheceu_jae?: string | null;
         };
       };
       acessos_aula: {

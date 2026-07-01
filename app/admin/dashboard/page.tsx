@@ -65,6 +65,16 @@ const PERGUNTAS_RESPOSTAS: PerguntaResposta[] = [
     campo: "o_que_faria_investir",
     label: "O que faria você investir mais para aprender coreano de forma completa?",
   },
+  {
+    tipo: "pizza",
+    campo: "tempo_conhece_jae",
+    label: "Há quanto tempo conhece o professor Jae Lee?",
+  },
+  {
+    tipo: "lista",
+    campo: "como_conheceu_jae",
+    label: "De onde você o conhece? Conta brevemente!",
+  },
 ];
 
 function pontosInteresse(r: Resposta): number {

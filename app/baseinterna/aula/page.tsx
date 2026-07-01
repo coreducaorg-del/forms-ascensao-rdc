@@ -78,7 +78,7 @@ export default function AulaPage() {
           // falha silenciosa — não interrompe a experiência da aluna
         }
       }
-    }, 30000);
+    }, 60000);
 
     return () => clearInterval(intervalo);
   }, []);

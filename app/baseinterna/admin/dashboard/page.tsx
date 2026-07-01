@@ -60,6 +60,26 @@ interface AlunaAcesso {
   dias_restantes: number;
 }
 
+function formatarTempo(segundos: number | null): string {
+  if (!segundos || segundos === 0) return "Ainda não assistiu";
+  const h = Math.floor(segundos / 3600);
+  const m = Math.floor((segundos % 3600) / 60);
+  const s = segundos % 60;
+  if (h > 0) return `${h}h ${m}min ${s}s`;
+  if (m > 0) return `${m}min ${s}s`;
+  return `${s}s`;
+}
+
+function formatarUltimoAcesso(iso: string): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(iso)).replace(",", " às");
+}
+
 // ── Componentes ───────────────────────────────────────────────────────────────
 
 function BolhaScore({ score }: { score: number }) {
@@ -154,6 +174,12 @@ function CardAcesso({
               <WhatsappPill whatsapp={whatsapp} copiado={copiado} onCopiar={onCopiar} />
             </div>
           )}
+          <p className={`text-xs mt-1 ${aluna.acesso.tempo_maximo_assistido ? "text-white" : "text-[#888888]"}`}>
+            ⏱️ Assistiu até: {formatarTempo(aluna.acesso.tempo_maximo_assistido)}
+          </p>
+          <p className="text-xs text-[#888888]">
+            🕐 Último acesso: {formatarUltimoAcesso(aluna.acesso.ultimo_acesso)}
+          </p>
         </div>
       )}
     </div>
@@ -262,6 +288,7 @@ export default function BaseInternaAdminDashboard() {
           data_expiracao: item.data_expiracao,
           total_acessos: item.total_acessos,
           ultimo_acesso: item.ultimo_acesso,
+          tempo_maximo_assistido: item.tempo_maximo_assistido ?? null,
         };
 
         const resposta: Resposta | null = item.nome_completo

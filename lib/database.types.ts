@@ -111,6 +111,7 @@ export interface Database {
           data_expiracao: string | null;
           total_acessos: number;
           ultimo_acesso: string;
+          tempo_maximo_assistido: number | null;
         };
         Insert: {
           id?: string;
@@ -119,6 +120,7 @@ export interface Database {
           data_expiracao?: string | null;
           total_acessos?: number;
           ultimo_acesso?: string;
+          tempo_maximo_assistido?: number | null;
         };
         Update: {
           id?: string;
@@ -127,6 +129,7 @@ export interface Database {
           data_expiracao?: string | null;
           total_acessos?: number;
           ultimo_acesso?: string;
+          tempo_maximo_assistido?: number | null;
         };
       };
     };

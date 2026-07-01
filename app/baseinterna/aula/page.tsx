@@ -60,6 +60,29 @@ export default function AulaPage() {
     verificarAcesso();
   }, [router]);
 
+  // Envia o tempo assistido para o servidor a cada 30 segundos
+  useEffect(() => {
+    const email = sessionStorage.getItem("email_aulao");
+    if (!email) return;
+
+    const intervalo = setInterval(async () => {
+      const tempoAtual = Number(sessionStorage.getItem("video_tempo_maximo") || 0);
+      if (tempoAtual > 0) {
+        try {
+          await fetch("/api/baseinterna/salvar-tempo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, tempo: tempoAtual }),
+          });
+        } catch {
+          // falha silenciosa — não interrompe a experiência da aluna
+        }
+      }
+    }, 30000);
+
+    return () => clearInterval(intervalo);
+  }, []);
+
   // Ao carregar, verificar se a pessoa já assistiu o suficiente em uma sessão anterior
   useEffect(() => {
     if (carregando || expirado) return;

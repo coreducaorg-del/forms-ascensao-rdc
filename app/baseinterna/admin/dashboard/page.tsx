@@ -292,7 +292,8 @@ export default function BaseInternaAdminDashboard() {
   }
 
   function copiarWhatsapp(id: string, numero: string) {
-    navigator.clipboard.writeText(numero);
+    const ultimos4 = (numero || "").replace(/\D/g, "").slice(-4);
+    navigator.clipboard.writeText(ultimos4);
     setCopiado(id);
     setTimeout(() => setCopiado(null), 2000);
   }

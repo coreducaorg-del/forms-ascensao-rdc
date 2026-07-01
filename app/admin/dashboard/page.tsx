@@ -355,7 +355,8 @@ export default function DashboardPage() {
   const [filtroFim, setFiltroFim] = useState("");
 
   function copiarWhatsapp(id: string, numero: string) {
-    navigator.clipboard.writeText(numero);
+    const ultimos4 = (numero || "").replace(/\D/g, "").slice(-4);
+    navigator.clipboard.writeText(ultimos4);
     setWhatsappCopiado(id);
     setTimeout(() => setWhatsappCopiado((atual) => (atual === id ? null : atual)), 2000);
   }

@@ -30,6 +30,8 @@ interface FormData {
   tempo_dedicacao: string;
   interesse_curso_completo: string;
   o_que_faria_investir: string;
+  tempo_conhece_jae: string;
+  como_conheceu_jae: string;
 }
 
 const initialFormData: FormData = {
@@ -58,6 +60,8 @@ const initialFormData: FormData = {
   tempo_dedicacao: "",
   interesse_curso_completo: "",
   o_que_faria_investir: "",
+  tempo_conhece_jae: "",
+  como_conheceu_jae: "",
 };
 
 const TOTAL_SECOES = 4;
@@ -263,6 +267,8 @@ function FormularioConteudo() {
     if (!formData.tempo_dedicacao) { novosErros.push("Selecione quanto tempo por dia você consegue se dedicar."); campos.push("tempo_dedicacao"); }
     if (!formData.interesse_curso_completo) { novosErros.push("Responda se teria interesse em um curso completo."); campos.push("interesse_curso_completo"); }
     if (!formData.o_que_faria_investir.trim()) { novosErros.push("Conte o que faria você investir mais no aprendizado do coreano."); campos.push("o_que_faria_investir"); }
+    if (!formData.tempo_conhece_jae) { novosErros.push("Selecione há quanto tempo você conhece o professor Jae Lee."); campos.push("tempo_conhece_jae"); }
+    if (formData.tempo_conhece_jae && !formData.como_conheceu_jae.trim()) { novosErros.push("Conte de onde você conhece o professor Jae Lee."); campos.push("como_conheceu_jae"); }
     setErros(novosErros);
     setCamposComErro(new Set(campos));
     return novosErros.length === 0;
@@ -756,6 +762,30 @@ function FormularioConteudo() {
                 className={inputClass("o_que_faria_investir")}
               />
             </div>
+
+            <div>
+              <Label erro={camposComErro.has("tempo_conhece_jae")}>Há quanto tempo conhece o professor Jae Lee?</Label>
+              <div className={camposComErro.has("tempo_conhece_jae") ? "rounded-lg border border-[#ff5252] p-1" : ""}>
+                <ChoiceButtons
+                  options={["Menos de 1 mês", "Cerca de 3 meses", "Cerca de 6 meses", "Cerca de 1 ano", "Mais de um ano atrás"]}
+                  selected={formData.tempo_conhece_jae}
+                  onSelect={(v) => set("tempo_conhece_jae", v)}
+                />
+              </div>
+              {camposComErro.has("tempo_conhece_jae") && <p className="text-[#ff5252] text-xs mt-1">* Campo obrigatório</p>}
+            </div>
+
+            {formData.tempo_conhece_jae && (
+              <div>
+                <Label erro={camposComErro.has("como_conheceu_jae")}>De onde você o conhece? Conta brevemente!</Label>
+                <textarea
+                  value={formData.como_conheceu_jae}
+                  onChange={(e) => set("como_conheceu_jae", e.target.value)}
+                  rows={4}
+                  className={inputClass("como_conheceu_jae")}
+                />
+              </div>
+            )}
           </div>
         )}
 

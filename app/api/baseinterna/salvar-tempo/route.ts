@@ -20,17 +20,14 @@ export async function POST(request: NextRequest) {
       .eq("email", emailNormalizado)
       .single();
 
-    console.log("Email normalizado:", emailNormalizado);
-    console.log("Acesso encontrado:", JSON.stringify(acesso));
-    console.log("Tempo recebido:", tempo, "→ inteiro:", tempoInteiro);
-
     if (acesso && tempoInteiro > (acesso.tempo_maximo_assistido || 0)) {
       const { error } = await supabaseAdmin
         .from("acessos_aula")
-        .update({ tempo_maximo_assistido: tempoInteiro })
+        .update({
+          tempo_maximo_assistido: tempoInteiro,
+          ultimo_acesso: new Date().toISOString(),
+        })
         .eq("email", emailNormalizado);
-
-      console.log("Erro do update:", JSON.stringify(error));
 
       if (error) throw error;
     }

@@ -16,14 +16,14 @@ export async function POST(request: NextRequest) {
     const { data: acesso } = await supabaseAdmin
       .from("acessos_aula")
       .select("tempo_maximo_assistido")
-      .ilike("email", emailNormalizado)
+      .eq("email", emailNormalizado)
       .single();
 
     if (acesso && tempo > (acesso.tempo_maximo_assistido || 0)) {
       const { error } = await supabaseAdmin
         .from("acessos_aula")
         .update({ tempo_maximo_assistido: tempo })
-        .ilike("email", emailNormalizado);
+        .eq("email", emailNormalizado);
 
       if (error) throw error;
     }

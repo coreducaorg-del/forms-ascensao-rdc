@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     const emailNormalizado = email.toLowerCase().trim();
+    const tempoInteiro = Math.floor(Number(tempo));
 
     const { data: acesso } = await supabaseAdmin
       .from("acessos_aula")
@@ -21,16 +22,15 @@ export async function POST(request: NextRequest) {
 
     console.log("Email normalizado:", emailNormalizado);
     console.log("Acesso encontrado:", JSON.stringify(acesso));
-    console.log("Tempo recebido:", tempo);
+    console.log("Tempo recebido:", tempo, "→ inteiro:", tempoInteiro);
 
-    if (acesso && tempo > (acesso.tempo_maximo_assistido || 0)) {
+    if (acesso && tempoInteiro > (acesso.tempo_maximo_assistido || 0)) {
       const { error } = await supabaseAdmin
         .from("acessos_aula")
-        .update({ tempo_maximo_assistido: tempo })
+        .update({ tempo_maximo_assistido: tempoInteiro })
         .eq("email", emailNormalizado);
 
       console.log("Erro do update:", JSON.stringify(error));
-      console.log("Detalhes do erro:", error?.message, error?.code, error?.details, error?.hint);
 
       if (error) throw error;
     }

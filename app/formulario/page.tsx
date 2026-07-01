@@ -301,6 +301,18 @@ function FormularioConteudo() {
     setEnviando(true);
     setErroEnvio("");
 
+    const { data: emailExistente } = await supabase
+      .from("respostas")
+      .select("email")
+      .ilike("email", formData.email)
+      .single();
+
+    if (emailExistente) {
+      setErroEnvio("Você já preencheu este formulário anteriormente com este e-mail. Caso precise de ajuda, entre em contato conosco.");
+      setEnviando(false);
+      return;
+    }
+
     const { error } = await supabase.from("respostas").insert([formData]);
 
     setEnviando(false);

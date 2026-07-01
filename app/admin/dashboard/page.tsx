@@ -353,6 +353,25 @@ export default function DashboardPage() {
   const [whatsappCopiado, setWhatsappCopiado] = useState<string | null>(null);
   const [filtroInicio, setFiltroInicio] = useState("");
   const [filtroFim, setFiltroFim] = useState("");
+  const [confirmarApagar, setConfirmarApagar] = useState<Resposta | null>(null);
+  const [apagando, setApagando] = useState(false);
+
+  async function apagarResposta(resposta: Resposta) {
+    setApagando(true);
+    try {
+      const response = await fetch(`/api/admin/respostas/${resposta.id}`, { method: "DELETE" });
+      const result = await response.json();
+      if (result.success) {
+        setRespostas((prev) => prev.filter((r) => r.id !== resposta.id));
+        if (selecionada?.id === resposta.id) setSelecionada(null);
+      }
+    } catch {
+      // erro silencioso — o card permanece na lista
+    } finally {
+      setApagando(false);
+      setConfirmarApagar(null);
+    }
+  }
 
   function copiarWhatsapp(id: string, numero: string) {
     const ultimos4 = (numero || "").replace(/\D/g, "").slice(-4);
@@ -478,6 +497,19 @@ export default function DashboardPage() {
                       className="absolute top-3 right-4 w-3 h-3 rounded-full"
                       style={{ backgroundColor: corScoreHex(score) }}
                     />
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setConfirmarApagar(r); }}
+                      className="absolute bottom-2 right-3 text-[#888888] hover:text-[#ef4444] transition-colors"
+                      title="Apagar resposta"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                        <path d="M10 11v6M14 11v6" />
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                      </svg>
+                    </button>
                   </Card>
                 );
               })}
@@ -794,6 +826,37 @@ export default function DashboardPage() {
                 <span className={`w-2.5 h-2.5 rounded-full ${corScore(calculateScore(selecionada))}`} />
                 <span className="text-white">Score: {calculateScore(selecionada)}/100</span>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmarApagar && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-6 w-full max-w-sm">
+            <h2 className="text-lg font-bold text-white mb-2">Apagar resposta</h2>
+            <p className="text-sm text-[#888888] mb-6">
+              Tem certeza que deseja apagar as respostas de{" "}
+              <span className="text-white font-medium">{confirmarApagar.nome_completo}</span>?
+              Esta ação não pode ser desfeita.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => setConfirmarApagar(null)}
+                disabled={apagando}
+                className="px-4 py-2 rounded-lg border border-[#2a2a2a] text-[#888888] hover:text-white hover:border-[#444] transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => apagarResposta(confirmarApagar)}
+                disabled={apagando}
+                className="px-4 py-2 rounded-lg bg-[#ef4444] text-white font-medium hover:bg-[#dc2626] transition-colors disabled:opacity-50"
+              >
+                {apagando ? "Apagando..." : "Apagar"}
+              </button>
             </div>
           </div>
         </div>

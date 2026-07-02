@@ -30,6 +30,7 @@ interface FormData {
   tempo_dedicacao: string;
   interesse_curso_completo: string;
   o_que_faria_investir: string;
+  prioridade_coreano: string;
   tempo_conhece_jae: string;
   como_conheceu_jae: string;
 }
@@ -60,6 +61,7 @@ const initialFormData: FormData = {
   tempo_dedicacao: "",
   interesse_curso_completo: "",
   o_que_faria_investir: "",
+  prioridade_coreano: "",
   tempo_conhece_jae: "",
   como_conheceu_jae: "",
 };
@@ -267,6 +269,7 @@ function FormularioConteudo() {
     if (!formData.tempo_dedicacao) { novosErros.push("Selecione quanto tempo por dia você consegue se dedicar."); campos.push("tempo_dedicacao"); }
     if (!formData.interesse_curso_completo) { novosErros.push("Responda se teria interesse em um curso completo."); campos.push("interesse_curso_completo"); }
     if (!formData.o_que_faria_investir.trim()) { novosErros.push("Conte o que faria você investir mais no aprendizado do coreano."); campos.push("o_que_faria_investir"); }
+    if (!formData.prioridade_coreano) { novosErros.push("Selecione sua prioridade de 0 a 10."); campos.push("prioridade_coreano"); }
     if (!formData.tempo_conhece_jae) { novosErros.push("Selecione há quanto tempo você conhece o professor Jae Lee."); campos.push("tempo_conhece_jae"); }
     if (formData.tempo_conhece_jae && !formData.como_conheceu_jae.trim()) { novosErros.push("Conte de onde você conhece o professor Jae Lee."); campos.push("como_conheceu_jae"); }
     setErros(novosErros);
@@ -773,6 +776,31 @@ function FormularioConteudo() {
                 rows={4}
                 className={inputClass("o_que_faria_investir")}
               />
+            </div>
+
+            <div>
+              <Label erro={camposComErro.has("prioridade_coreano")}>
+                De 0 a 10, o quanto aprender coreano é uma prioridade real na sua vida agora?
+              </Label>
+              <div className={camposComErro.has("prioridade_coreano") ? "rounded-lg border border-[#ff5252] p-1" : ""}>
+                <div className="grid grid-cols-4 gap-2">
+                  {["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"].map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => set("prioridade_coreano", n)}
+                      className={`py-3 rounded-lg border text-sm font-bold transition-colors ${
+                        formData.prioridade_coreano === n
+                          ? "bg-[#eef3fb] text-[#3574b5] border-[#3574b5]"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-[#3574b5]"
+                      }`}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {camposComErro.has("prioridade_coreano") && <p className="text-[#ff5252] text-xs mt-1">* Campo obrigatório</p>}
             </div>
 
             <div>

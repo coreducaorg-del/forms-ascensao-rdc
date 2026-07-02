@@ -35,6 +35,7 @@ export interface Database {
           tempo_dedicacao: string | null;
           interesse_curso_completo: string | null;
           o_que_faria_investir: string | null;
+          prioridade_coreano: string | null;
           tempo_conhece_jae: string | null;
           como_conheceu_jae: string | null;
         };
@@ -67,6 +68,7 @@ export interface Database {
           tempo_dedicacao?: string | null;
           interesse_curso_completo?: string | null;
           o_que_faria_investir?: string | null;
+          prioridade_coreano?: string | null;
           tempo_conhece_jae?: string | null;
           como_conheceu_jae?: string | null;
         };
@@ -99,6 +101,7 @@ export interface Database {
           tempo_dedicacao?: string | null;
           interesse_curso_completo?: string | null;
           o_que_faria_investir?: string | null;
+          prioridade_coreano?: string | null;
           tempo_conhece_jae?: string | null;
           como_conheceu_jae?: string | null;
         };

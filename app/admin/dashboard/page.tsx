@@ -67,6 +67,11 @@ const PERGUNTAS_RESPOSTAS: PerguntaResposta[] = [
   },
   {
     tipo: "pizza",
+    campo: "prioridade_coreano",
+    label: "De 0 a 10, o quanto aprender coreano é uma prioridade real na sua vida agora?",
+  },
+  {
+    tipo: "pizza",
     campo: "tempo_conhece_jae",
     label: "Há quanto tempo conhece o professor Jae Lee?",
   },
@@ -78,14 +83,9 @@ const PERGUNTAS_RESPOSTAS: PerguntaResposta[] = [
 ];
 
 function pontosInteresse(r: Resposta): number {
-  switch (r.interesse_curso_completo) {
-    case "Sim, com certeza":
-      return 40;
-    case "Talvez, dependendo do valor":
-      return 30;
-    default:
-      return 0;
-  }
+  if (r.interesse_curso_completo === "Sim, com certeza") return 30;
+  if (r.interesse_curso_completo === "Talvez, dependendo do valor") return 20;
+  return 0;
 }
 
 function pontosRenda(r: Resposta): number {
@@ -100,7 +100,24 @@ function pontosRenda(r: Resposta): number {
 
   if (r.faixa_renda && rendaAlta.includes(r.faixa_renda)) return 30;
   if (r.faixa_renda && rendaMedia.includes(r.faixa_renda)) return 20;
-  if (r.faixa_renda === "Menos de R$ 1.000") return 5;
+  if (r.faixa_renda === "Menos de R$ 1.000" || r.faixa_renda === "Sem Renda") return 5;
+  return 0;
+}
+
+function pontosPrioridade(r: Resposta): number {
+  const p = Number(r.prioridade_coreano ?? 0);
+  if (p >= 9) return 20;
+  if (p >= 7) return 15;
+  if (p >= 5) return 8;
+  if (p >= 3) return 3;
+  return 0;
+}
+
+function pontosIdade(r: Resposta): number {
+  const idadeAlta = ["25-34", "35-44", "45-54", "55-65", "+65"];
+  if (r.faixa_etaria && idadeAlta.includes(r.faixa_etaria)) return 10;
+  if (r.faixa_etaria === "18-24") return 6;
+  if (r.faixa_etaria === "13-17") return 2;
   return 0;
 }
 
@@ -110,18 +127,8 @@ function pontosEscolaridade(r: Resposta): number {
     "Mestrado ou Doutorado Completo",
     "Ensino Médio Completo",
   ];
-
-  if (r.escolaridade && escolaridadeAlta.includes(r.escolaridade)) return 15;
+  if (r.escolaridade && escolaridadeAlta.includes(r.escolaridade)) return 10;
   if (r.escolaridade === "Ensino Fundamental Completo") return 5;
-  return 0;
-}
-
-function pontosIdade(r: Resposta): number {
-  const idadeAlta = ["25-34", "35-44", "45-54", "55-65", "+65"];
-
-  if (r.faixa_etaria && idadeAlta.includes(r.faixa_etaria)) return 15;
-  if (r.faixa_etaria === "18-24") return 10;
-  if (r.faixa_etaria === "13-17") return 5;
   return 0;
 }
 
@@ -129,20 +136,21 @@ function calculateScore(resposta: Resposta): number {
   return (
     pontosInteresse(resposta) +
     pontosRenda(resposta) +
-    pontosEscolaridade(resposta) +
-    pontosIdade(resposta)
+    pontosPrioridade(resposta) +
+    pontosIdade(resposta) +
+    pontosEscolaridade(resposta)
   );
 }
 
 function corScore(score: number): string {
   if (score >= 75) return "bg-green-500";
-  if (score >= 40) return "bg-yellow-500";
+  if (score >= 50) return "bg-yellow-500";
   return "bg-red-500";
 }
 
 function corScoreHex(score: number): string {
   if (score >= 75) return "#22c55e";
-  if (score >= 40) return "#eab308";
+  if (score >= 50) return "#eab308";
   return "#ef4444";
 }
 
@@ -620,15 +628,21 @@ export default function DashboardPage() {
                             </span>
                           </p>
                           <p className="flex items-center gap-2 flex-wrap">
-                            ✦ Escolaridade: {resposta.escolaridade || "—"}
+                            ✦ Prioridade coreano: {resposta.prioridade_coreano || "—"}
                             <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
-                              {pontosEscolaridade(resposta)} pontos
+                              {pontosPrioridade(resposta)} pontos
                             </span>
                           </p>
                           <p className="flex items-center gap-2 flex-wrap">
                             ✦ Faixa etária: {resposta.faixa_etaria || "—"}
                             <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
                               {pontosIdade(resposta)} pontos
+                            </span>
+                          </p>
+                          <p className="flex items-center gap-2 flex-wrap">
+                            ✦ Escolaridade: {resposta.escolaridade || "—"}
+                            <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
+                              {pontosEscolaridade(resposta)} pontos
                             </span>
                           </p>
                           <p className="flex items-center gap-2 flex-wrap font-medium mt-1">
@@ -830,6 +844,9 @@ export default function DashboardPage() {
                 <p className="text-[#888888]">Tempo de dedicação: <span className="text-white">{selecionada.tempo_dedicacao || "—"}</span></p>
                 <p className="text-[#888888]">Interesse no curso completo: <span className="text-white">{selecionada.interesse_curso_completo || "—"}</span></p>
                 <p className="text-[#888888]">O que faria investir: <span className="text-white">{selecionada.o_que_faria_investir || "—"}</span></p>
+                <p className="text-[#888888]">Prioridade do coreano (0-10): <span className="text-white">{selecionada.prioridade_coreano || "—"}</span></p>
+                <p className="text-[#888888]">Há quanto tempo conhece o Jae: <span className="text-white">{selecionada.tempo_conhece_jae || "—"}</span></p>
+                <p className="text-[#888888]">De onde conheceu o Jae: <span className="text-white">{selecionada.como_conheceu_jae || "—"}</span></p>
               </div>
 
               <div className="flex items-center gap-2 border-t border-[#2a2a2a] pt-4">

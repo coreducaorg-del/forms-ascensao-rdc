@@ -9,45 +9,44 @@ type Aba = "acessos" | "urgencia";
 
 // ── Score (mesma lógica do painel principal) ──────────────────────────────────
 
-function pontosInteresse(r: Resposta): number {
-  switch (r.interesse_curso_completo) {
-    case "Sim, com certeza": return 40;
-    case "Talvez, dependendo do valor": return 30;
-    default: return 0;
-  }
-}
-
-function pontosRenda(r: Resposta): number {
-  const alta = ["Entre R$ 3.001 e R$ 4.000","Entre R$ 4.001 e R$ 5.000","Entre R$ 5.001 e R$ 10.000","Entre R$ 10.001 e R$ 20.000","Mais de R$ 20.001"];
-  const media = ["Entre R$ 1.001 e R$ 2.000","Entre R$ 2.001 e R$ 3.000"];
-  if (r.faixa_renda && alta.includes(r.faixa_renda)) return 30;
-  if (r.faixa_renda && media.includes(r.faixa_renda)) return 20;
-  if (r.faixa_renda === "Menos de R$ 1.000") return 5;
-  return 0;
-}
-
-function pontosEscolaridade(r: Resposta): number {
-  const alta = ["Ensino Superior Completo","Mestrado ou Doutorado Completo","Ensino Médio Completo"];
-  if (r.escolaridade && alta.includes(r.escolaridade)) return 15;
-  if (r.escolaridade === "Ensino Fundamental Completo") return 5;
-  return 0;
-}
-
-function pontosIdade(r: Resposta): number {
-  const alta = ["25-34","35-44","45-54","55-65","+65"];
-  if (r.faixa_etaria && alta.includes(r.faixa_etaria)) return 15;
-  if (r.faixa_etaria === "18-24") return 10;
-  if (r.faixa_etaria === "13-17") return 5;
-  return 0;
-}
-
 function calculateScore(r: Resposta): number {
-  return pontosInteresse(r) + pontosRenda(r) + pontosEscolaridade(r) + pontosIdade(r);
+  let score = 0;
+
+  // Interesse — 30 pts
+  if (r.interesse_curso_completo === "Sim, com certeza") score += 30;
+  else if (r.interesse_curso_completo === "Talvez, dependendo do valor") score += 20;
+
+  // Renda — 30 pts
+  const rendaAlta = ["Entre R$ 3.001 e R$ 4.000","Entre R$ 4.001 e R$ 5.000","Entre R$ 5.001 e R$ 10.000","Entre R$ 10.001 e R$ 20.000","Mais de R$ 20.001"];
+  const rendaMedia = ["Entre R$ 1.001 e R$ 2.000","Entre R$ 2.001 e R$ 3.000"];
+  if (r.faixa_renda && rendaAlta.includes(r.faixa_renda)) score += 30;
+  else if (r.faixa_renda && rendaMedia.includes(r.faixa_renda)) score += 20;
+  else if (r.faixa_renda === "Menos de R$ 1.000" || r.faixa_renda === "Sem Renda") score += 5;
+
+  // Prioridade coreano — 20 pts
+  const p = Number(r.prioridade_coreano ?? 0);
+  if (p >= 9) score += 20;
+  else if (p >= 7) score += 15;
+  else if (p >= 5) score += 8;
+  else if (p >= 3) score += 3;
+
+  // Faixa etária — 10 pts
+  const idadeAlta = ["25-34","35-44","45-54","55-65","+65"];
+  if (r.faixa_etaria && idadeAlta.includes(r.faixa_etaria)) score += 10;
+  else if (r.faixa_etaria === "18-24") score += 6;
+  else if (r.faixa_etaria === "13-17") score += 2;
+
+  // Escolaridade — 10 pts
+  const escolaridadeAlta = ["Ensino Superior Completo","Mestrado ou Doutorado Completo","Ensino Médio Completo"];
+  if (r.escolaridade && escolaridadeAlta.includes(r.escolaridade)) score += 10;
+  else if (r.escolaridade === "Ensino Fundamental Completo") score += 5;
+
+  return score;
 }
 
 function corScoreHex(score: number): string {
   if (score >= 75) return "#22c55e";
-  if (score >= 40) return "#eab308";
+  if (score >= 50) return "#eab308";
   return "#ef4444";
 }
 
@@ -300,6 +299,7 @@ export default function BaseInternaAdminDashboard() {
               faixa_renda: item.faixa_renda,
               escolaridade: item.escolaridade,
               faixa_etaria: item.faixa_etaria,
+              prioridade_coreano: item.prioridade_coreano,
             } as Resposta
           : null;
 
@@ -334,8 +334,8 @@ export default function BaseInternaAdminDashboard() {
       const nome = (a.resposta?.nome_completo ?? a.acesso.email).toLowerCase();
       if (busca && !nome.includes(busca.toLowerCase())) return false;
       if (filtroScore === "alta" && a.score < 75) return false;
-      if (filtroScore === "media" && (a.score < 40 || a.score > 74)) return false;
-      if (filtroScore === "baixa" && a.score >= 40) return false;
+      if (filtroScore === "media" && (a.score < 50 || a.score > 74)) return false;
+      if (filtroScore === "baixa" && a.score >= 50) return false;
       return true;
     });
   }, [alunas, busca, filtroScore]);
@@ -371,9 +371,9 @@ export default function BaseInternaAdminDashboard() {
             className={inputClass}
           >
             <option value="todos">Todos os scores</option>
-            <option value="alta">Alta chance (75-100)</option>
-            <option value="media">Média chance (40-74)</option>
-            <option value="baixa">Baixa chance (0-39)</option>
+            <option value="alta">BOM (75-100)</option>
+            <option value="media">ANALISAR (50-74)</option>
+            <option value="baixa">DESCARTE (0-49)</option>
           </select>
         </div>
       </div>

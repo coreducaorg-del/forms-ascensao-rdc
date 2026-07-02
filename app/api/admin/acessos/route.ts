@@ -19,7 +19,7 @@ export async function GET() {
         const { data: resposta } = await supabaseAdmin
           .from("respostas")
           .select(
-            "nome_completo, whatsapp, interesse_curso_completo, faixa_renda, escolaridade, faixa_etaria"
+            "nome_completo, whatsapp, interesse_curso_completo, faixa_renda, escolaridade, faixa_etaria, prioridade_coreano"
           )
           .ilike("email", acesso.email)
           .single();

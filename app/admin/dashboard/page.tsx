@@ -376,6 +376,8 @@ export default function DashboardPage() {
   const [filtroFim, setFiltroFim] = useState("");
   const [confirmarApagar, setConfirmarApagar] = useState<Resposta | null>(null);
   const [apagando, setApagando] = useState(false);
+  const [leadsAbordados, setLeadsAbordados] = useState<Set<string>>(new Set());
+  const [ordemRanking, setOrdemRanking] = useState<"score" | "data">("score");
 
   async function apagarResposta(resposta: Resposta) {
     setApagando(true);
@@ -415,8 +417,12 @@ export default function DashboardPage() {
 
     async function carregar() {
       try {
-        const response = await fetch("/api/admin/respostas");
-        const result = await response.json();
+        const [resResponse, abordadosResponse] = await Promise.all([
+          fetch("/api/admin/respostas"),
+          fetch("/api/admin/leads-abordados"),
+        ]);
+        const result = await resResponse.json();
+        const resultAbordados = await abordadosResponse.json();
 
         if (result.success) {
           setRespostas(result.data ?? []);
@@ -424,6 +430,11 @@ export default function DashboardPage() {
           console.error("Erro ao buscar respostas:", result.error);
           setRespostas([]);
         }
+
+        const ids = new Set<string>(
+          resultAbordados.data?.map((item: { resposta_id: string }) => item.resposta_id) ?? []
+        );
+        setLeadsAbordados(ids);
       } catch (error) {
         console.error("Erro ao buscar respostas:", error);
         setRespostas([]);
@@ -451,13 +462,33 @@ export default function DashboardPage() {
     );
   }, [respostasComData, busca]);
 
-  const ranking = useMemo(
-    () =>
-      [...respostasComData]
-        .map((r) => ({ resposta: r, score: calculateScore(r) }))
-        .sort((a, b) => b.score - a.score),
-    [respostasComData]
-  );
+  const ranking = useMemo(() => {
+    const items = [...respostasComData].map((r) => ({ resposta: r, score: calculateScore(r) }));
+    if (ordemRanking === "data") {
+      return items.sort(
+        (a, b) => new Date(b.resposta.criado_em).getTime() - new Date(a.resposta.criado_em).getTime()
+      );
+    }
+    return items.sort((a, b) => b.score - a.score);
+  }, [respostasComData, ordemRanking]);
+
+  async function marcarAbordado(id: string) {
+    await fetch("/api/admin/leads-abordados", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resposta_id: id }),
+    });
+    setLeadsAbordados((prev) => { const next = new Set(prev); next.add(id); return next; });
+  }
+
+  async function desmarcarAbordado(id: string) {
+    await fetch(`/api/admin/leads-abordados/${id}`, { method: "DELETE" });
+    setLeadsAbordados((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }
 
   function limparFiltroData() {
     setFiltroInicio("");
@@ -591,30 +622,56 @@ export default function DashboardPage() {
             />
 
             <div>
-              <h2 className="text-lg font-bold mb-3">Ranking de Ascensão</h2>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold">Ranking de Ascensão</h2>
+                <div className="flex gap-1">
+                  {(["score", "data"] as const).map((ordem) => (
+                    <button
+                      key={ordem}
+                      type="button"
+                      onClick={() => setOrdemRanking(ordem)}
+                      className="px-2 py-1 rounded text-xs transition-colors"
+                      style={{
+                        backgroundColor: ordemRanking === ordem ? "#3574b5" : "#2a2a2a",
+                        color: ordemRanking === ordem ? "#ffffff" : "#888888",
+                      }}
+                    >
+                      {ordem === "score" ? "Por nota" : "Por data"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bloco 1: não abordados */}
               <div className="flex flex-col gap-3 max-h-72 overflow-y-auto scroll-azul pr-1">
-                {ranking.map(({ resposta, score }) => {
+                {ranking.filter(({ resposta }) => !leadsAbordados.has(resposta.id)).map(({ resposta, score }) => {
                   const expandido = rankingExpandido === resposta.id;
                   return (
                     <Card key={resposta.id} className="p-4">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setRankingExpandido(expandido ? null : resposta.id)
-                        }
-                        className="w-full flex items-center justify-between text-left"
-                      >
-                        <div>
-                          <span className="font-semibold text-white">{resposta.nome_completo}</span>
-                          <span className="text-xs text-gray-500 ml-2">
-                            ({formatarDataCurta(resposta.criado_em)})
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`w-2.5 h-2.5 rounded-full ${corScore(score)}`} />
-                          <span className="text-sm text-white">{score}/100</span>
-                        </div>
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => marcarAbordado(resposta.id)}
+                          className="shrink-0 w-5 h-5 rounded-full border-2 border-[#555555] hover:border-[#3574b5] transition-colors"
+                          title="Marcar como abordado"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setRankingExpandido(expandido ? null : resposta.id)}
+                          className="flex-1 flex items-center justify-between text-left"
+                        >
+                          <div>
+                            <span className="font-semibold text-white">{resposta.nome_completo}</span>
+                            <span className="text-xs text-gray-500 ml-2">
+                              ({formatarDataCurta(resposta.criado_em)})
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`w-2.5 h-2.5 rounded-full ${corScore(score)}`} />
+                            <span className="text-sm text-white">{score}/100</span>
+                          </div>
+                        </button>
+                      </div>
 
                       {expandido && (
                         <div className="mt-3 pt-3 border-t border-[#2a2a2a] flex flex-col gap-2 text-sm text-white">
@@ -665,6 +722,95 @@ export default function DashboardPage() {
                   );
                 })}
               </div>
+
+              {/* Bloco 2: já abordados */}
+              {ranking.some(({ resposta }) => leadsAbordados.has(resposta.id)) && (
+                <div className="mt-4">
+                  <h3 className="text-sm font-semibold text-[#888888] mb-2">Já Abordados</h3>
+                  <div className="flex flex-col gap-3 max-h-72 overflow-y-auto scroll-azul pr-1">
+                    {ranking.filter(({ resposta }) => leadsAbordados.has(resposta.id)).map(({ resposta, score }) => {
+                      const expandido = rankingExpandido === resposta.id;
+                      return (
+                        <div key={resposta.id} className="rounded-xl border border-[#2a2a2a] p-4" style={{ backgroundColor: "#252525" }}>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => desmarcarAbordado(resposta.id)}
+                              className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-white text-xs transition-colors"
+                              style={{ backgroundColor: "#3574b5" }}
+                              title="Desmarcar abordado"
+                            >
+                              ✓
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setRankingExpandido(expandido ? null : resposta.id)}
+                              className="flex-1 flex items-center justify-between text-left"
+                            >
+                              <div>
+                                <span className="font-semibold text-[#888888]">{resposta.nome_completo}</span>
+                                <span className="text-xs text-[#555555] ml-2">
+                                  ({formatarDataCurta(resposta.criado_em)})
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className={`w-2.5 h-2.5 rounded-full ${corScore(score)}`} />
+                                <span className="text-sm text-[#888888]">{score}/100</span>
+                              </div>
+                            </button>
+                          </div>
+
+                          {expandido && (
+                            <div className="mt-3 pt-3 border-t border-[#333333] flex flex-col gap-2 text-sm text-white">
+                              <p className="flex items-center gap-2 flex-wrap">
+                                ✦ Interesse no curso: {resposta.interesse_curso_completo || "—"}
+                                <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
+                                  {pontosInteresse(resposta)} pontos
+                                </span>
+                              </p>
+                              <p className="flex items-center gap-2 flex-wrap">
+                                ✦ Renda mensal: {resposta.faixa_renda || "—"}
+                                <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
+                                  {pontosRenda(resposta)} pontos
+                                </span>
+                              </p>
+                              <p className="flex items-center gap-2 flex-wrap">
+                                ✦ Prioridade coreano: {resposta.prioridade_coreano || "—"}
+                                <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
+                                  {pontosPrioridade(resposta)} pontos
+                                </span>
+                              </p>
+                              <p className="flex items-center gap-2 flex-wrap">
+                                ✦ Faixa etária: {resposta.faixa_etaria || "—"}
+                                <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
+                                  {pontosIdade(resposta)} pontos
+                                </span>
+                              </p>
+                              <p className="flex items-center gap-2 flex-wrap">
+                                ✦ Escolaridade: {resposta.escolaridade || "—"}
+                                <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
+                                  {pontosEscolaridade(resposta)} pontos
+                                </span>
+                              </p>
+                              <p className="flex items-center gap-2 flex-wrap font-medium mt-1">
+                                ✦ Total:
+                                <span className="border border-[#3574b5] text-[#3574b5] rounded-full px-2 py-0.5 text-xs">
+                                  {score}/100 pontos
+                                </span>
+                              </p>
+                              <WhatsappPill
+                                whatsapp={resposta.whatsapp}
+                                copiado={whatsappCopiado === resposta.id}
+                                onCopiar={() => copiarWhatsapp(resposta.id, resposta.whatsapp)}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div>

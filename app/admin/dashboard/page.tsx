@@ -15,14 +15,17 @@ import type { Resposta } from "@/lib/database.types";
 type Aba = "alunas" | "respostas" | "analise";
 
 const CORES_GRAFICO = [
-  "#3574b5", // azul principal
-  "#ff5252", // vermelho principal
-  "#5a9fd4", // azul claro
-  "#ff8a80", // vermelho claro
-  "#1a4f8a", // azul escuro
-  "#c62828", // vermelho escuro
-  "#7eb3e0", // azul bem claro
-  "#ff6b6b", // vermelho médio
+  "#3574b5", // azul
+  "#ff5252", // vermelho
+  "#22c55e", // verde
+  "#f59e0b", // amarelo/laranja
+  "#a855f7", // roxo
+  "#06b6d4", // ciano
+  "#f97316", // laranja
+  "#ec4899", // rosa
+  "#84cc16", // verde limão
+  "#14b8a6", // teal
+  "#8b5cf6", // violeta
 ];
 
 type PerguntaResposta =
@@ -57,18 +60,8 @@ const PERGUNTAS_RESPOSTAS: PerguntaResposta[] = [
   { tipo: "pizza", campo: "tempo_dedicacao", label: "Quanto tempo por dia você consegue se dedicar?" },
   {
     tipo: "pizza",
-    campo: "interesse_curso_completo",
-    label: "Você teria interesse em conhecer um caminho completo?",
-  },
-  {
-    tipo: "lista",
-    campo: "o_que_faria_investir",
-    label: "O que faria você investir mais para aprender coreano de forma completa?",
-  },
-  {
-    tipo: "pizza",
     campo: "prioridade_coreano",
-    label: "De 0 a 10, o quanto aprender coreano é uma prioridade real na sua vida agora?",
+    label: "Hoje, de 0 a 10, o quanto aprender coreano é uma prioridade real na sua vida? (sinceridade)",
   },
   {
     tipo: "pizza",
@@ -79,6 +72,16 @@ const PERGUNTAS_RESPOSTAS: PerguntaResposta[] = [
     tipo: "lista",
     campo: "como_conheceu_jae",
     label: "De onde você o conhece? Conta brevemente!",
+  },
+  {
+    tipo: "pizza",
+    campo: "interesse_curso_completo",
+    label: "Você teria interesse em conhecer um caminho completo?",
+  },
+  {
+    tipo: "lista",
+    campo: "o_que_faria_investir",
+    label: "O que faria você investir mais para aprender coreano de forma completa?",
   },
 ];
 
@@ -842,11 +845,11 @@ export default function DashboardPage() {
               <div>
                 <h3 className="text-[#3574b5] font-medium mb-2">Prontidão</h3>
                 <p className="text-[#888888]">Tempo de dedicação: <span className="text-white">{selecionada.tempo_dedicacao || "—"}</span></p>
-                <p className="text-[#888888]">Interesse no curso completo: <span className="text-white">{selecionada.interesse_curso_completo || "—"}</span></p>
-                <p className="text-[#888888]">O que faria investir: <span className="text-white">{selecionada.o_que_faria_investir || "—"}</span></p>
                 <p className="text-[#888888]">Prioridade do coreano (0-10): <span className="text-white">{selecionada.prioridade_coreano || "—"}</span></p>
                 <p className="text-[#888888]">Há quanto tempo conhece o Jae: <span className="text-white">{selecionada.tempo_conhece_jae || "—"}</span></p>
                 <p className="text-[#888888]">De onde conheceu o Jae: <span className="text-white">{selecionada.como_conheceu_jae || "—"}</span></p>
+                <p className="text-[#888888]">Interesse no curso completo: <span className="text-white">{selecionada.interesse_curso_completo || "—"}</span></p>
+                <p className="text-[#888888]">O que faria investir: <span className="text-white">{selecionada.o_que_faria_investir || "—"}</span></p>
               </div>
 
               <div className="flex items-center gap-2 border-t border-[#2a2a2a] pt-4">

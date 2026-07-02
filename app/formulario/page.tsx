@@ -248,8 +248,8 @@ function FormularioConteudo() {
     if (formData.estado_civil === "Outro" && !formData.estado_civil_outro.trim()) { novosErros.push("Preencha seu estado civil."); campos.push("estado_civil_outro"); }
     if (!formData.tem_filhos) { novosErros.push("Responda se você tem filhos."); campos.push("tem_filhos"); }
     if (formData.tem_filhos === "Sim" && !formData.quantidade_filhos.trim()) { novosErros.push("Informe quantos filhos você tem."); campos.push("quantidade_filhos"); }
-    if (!formData.tem_netos) { novosErros.push("Responda se você tem netos."); campos.push("tem_netos"); }
-    if (formData.tem_netos === "Sim" && !formData.quantidade_netos.trim()) { novosErros.push("Informe quantos netos você tem."); campos.push("quantidade_netos"); }
+    if (formData.tem_filhos === "Sim" && !formData.tem_netos) { novosErros.push("Responda se você tem netos."); campos.push("tem_netos"); }
+    if (formData.tem_filhos === "Sim" && formData.tem_netos === "Sim" && !formData.quantidade_netos.trim()) { novosErros.push("Informe quantos netos você tem."); campos.push("quantidade_netos"); }
     if (!formData.escolaridade) { novosErros.push("Selecione seu grau de escolaridade."); campos.push("escolaridade"); }
     if (
       (formData.escolaridade === "Ensino Superior Completo" ||
@@ -618,7 +618,13 @@ function FormularioConteudo() {
                 <ChoiceButtons
                   options={["Sim", "Não"]}
                   selected={formData.tem_filhos}
-                  onSelect={(v) => set("tem_filhos", v)}
+                  onSelect={(v) => {
+                    set("tem_filhos", v);
+                    if (v === "Não") {
+                      set("tem_netos", "");
+                      set("quantidade_netos", "");
+                    }
+                  }}
                 />
               </div>
               {camposComErro.has("tem_filhos") && <p className="text-[#ff5252] text-xs mt-1">* Campo obrigatório</p>}
@@ -633,6 +639,7 @@ function FormularioConteudo() {
               )}
             </div>
 
+            {formData.tem_filhos === "Sim" && (
             <div>
               <Label erro={camposComErro.has("tem_netos")}>E netos?</Label>
               <div className={camposComErro.has("tem_netos") ? "rounded-lg border border-[#ff5252] p-1" : ""}>
@@ -653,6 +660,7 @@ function FormularioConteudo() {
                 />
               )}
             </div>
+            )}
 
             <div>
               <Label erro={camposComErro.has("escolaridade")}>

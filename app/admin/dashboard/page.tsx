@@ -378,6 +378,9 @@ export default function DashboardPage() {
   const [apagando, setApagando] = useState(false);
   const [leadsAbordados, setLeadsAbordados] = useState<Set<string>>(new Set());
   const [ordemRanking, setOrdemRanking] = useState<"score" | "data">("score");
+  const [buscaRanking, setBuscaRanking] = useState("");
+  const [ordemInteresse, setOrdemInteresse] = useState<"resposta" | "data">("resposta");
+  const [ordemRenda, setOrdemRenda] = useState<"valor" | "data">("valor");
 
   async function apagarResposta(resposta: Resposta) {
     setApagando(true);
@@ -471,6 +474,49 @@ export default function DashboardPage() {
     }
     return items.sort((a, b) => b.score - a.score);
   }, [respostasComData, ordemRanking]);
+
+  const rankingFiltrado = useMemo(() => {
+    if (!buscaRanking.trim()) return ranking;
+    return ranking.filter(({ resposta }) =>
+      resposta.nome_completo.toLowerCase().includes(buscaRanking.toLowerCase())
+    );
+  }, [ranking, buscaRanking]);
+
+  const ORDEM_INTERESSE = ["Sim, com certeza", "Talvez, dependendo do valor"];
+  const interesseOrdenado = useMemo(() => {
+    const items = [...respostasComData];
+    if (ordemInteresse === "data") {
+      return items.sort((a, b) => new Date(b.criado_em).getTime() - new Date(a.criado_em).getTime());
+    }
+    return items.sort((a, b) => {
+      const ia = ORDEM_INTERESSE.indexOf(a.interesse_curso_completo ?? "");
+      const ib = ORDEM_INTERESSE.indexOf(b.interesse_curso_completo ?? "");
+      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    });
+  }, [respostasComData, ordemInteresse]);
+
+  const ORDEM_RENDA = [
+    "Mais de R$ 20.001",
+    "Entre R$ 10.001 e R$ 20.000",
+    "Entre R$ 5.001 e R$ 10.000",
+    "Entre R$ 4.001 e R$ 5.000",
+    "Entre R$ 3.001 e R$ 4.000",
+    "Entre R$ 2.001 e R$ 3.000",
+    "Entre R$ 1.001 e R$ 2.000",
+    "Menos de R$ 1.000",
+    "Sem Renda",
+  ];
+  const rendaOrdenada = useMemo(() => {
+    const items = [...respostasComData];
+    if (ordemRenda === "data") {
+      return items.sort((a, b) => new Date(b.criado_em).getTime() - new Date(a.criado_em).getTime());
+    }
+    return items.sort((a, b) => {
+      const ia = ORDEM_RENDA.indexOf(a.faixa_renda ?? "");
+      const ib = ORDEM_RENDA.indexOf(b.faixa_renda ?? "");
+      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    });
+  }, [respostasComData, ordemRenda]);
 
   async function marcarAbordado(id: string) {
     await fetch("/api/admin/leads-abordados", {
@@ -622,7 +668,7 @@ export default function DashboardPage() {
             />
 
             <div>
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-2">
                 <h2 className="text-lg font-bold">Ranking de Ascensão</h2>
                 <div className="flex gap-1">
                   {(["score", "data"] as const).map((ordem) => (
@@ -642,9 +688,17 @@ export default function DashboardPage() {
                 </div>
               </div>
 
+              <input
+                type="text"
+                value={buscaRanking}
+                onChange={(e) => setBuscaRanking(e.target.value)}
+                placeholder="Buscar por nome..."
+                className="w-full mb-3 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-1.5 text-sm text-white placeholder-[#555555] focus:outline-none focus:border-[#3574b5]"
+              />
+
               {/* Bloco 1: não abordados */}
               <div className="flex flex-col gap-3 max-h-72 overflow-y-auto scroll-azul pr-1">
-                {ranking.filter(({ resposta }) => !leadsAbordados.has(resposta.id)).map(({ resposta, score }) => {
+                {rankingFiltrado.filter(({ resposta }) => !leadsAbordados.has(resposta.id)).map(({ resposta, score }) => {
                   const expandido = rankingExpandido === resposta.id;
                   return (
                     <Card key={resposta.id} className="p-4">
@@ -724,11 +778,11 @@ export default function DashboardPage() {
               </div>
 
               {/* Bloco 2: já abordados */}
-              {ranking.some(({ resposta }) => leadsAbordados.has(resposta.id)) && (
+              {rankingFiltrado.some(({ resposta }) => leadsAbordados.has(resposta.id)) && (
                 <div className="mt-4">
                   <h3 className="text-sm font-semibold text-[#888888] mb-2">Já Abordados</h3>
                   <div className="flex flex-col gap-3 max-h-72 overflow-y-auto scroll-azul pr-1">
-                    {ranking.filter(({ resposta }) => leadsAbordados.has(resposta.id)).map(({ resposta, score }) => {
+                    {rankingFiltrado.filter(({ resposta }) => leadsAbordados.has(resposta.id)).map(({ resposta, score }) => {
                       const expandido = rankingExpandido === resposta.id;
                       return (
                         <div key={resposta.id} className="rounded-xl border border-[#2a2a2a] p-4" style={{ backgroundColor: "#252525" }}>
@@ -814,9 +868,27 @@ export default function DashboardPage() {
             </div>
 
             <div>
-              <h2 className="text-lg font-bold mb-3">Interesse no Curso Completo</h2>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold">Interesse no Curso Completo</h2>
+                <div className="flex gap-1">
+                  {(["resposta", "data"] as const).map((ordem) => (
+                    <button
+                      key={ordem}
+                      type="button"
+                      onClick={() => setOrdemInteresse(ordem)}
+                      className="px-2 py-1 rounded text-xs transition-colors"
+                      style={{
+                        backgroundColor: ordemInteresse === ordem ? "#3574b5" : "#2a2a2a",
+                        color: ordemInteresse === ordem ? "#ffffff" : "#888888",
+                      }}
+                    >
+                      {ordem === "resposta" ? "Por resposta" : "Por data"}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="flex flex-col gap-3 max-h-72 overflow-y-auto scroll-azul pr-1">
-                {respostasComData.map((r) => {
+                {interesseOrdenado.map((r) => {
                   const badge =
                     r.interesse_curso_completo === "Sim, com certeza"
                       ? "bg-green-950 text-green-400 border-green-800"
@@ -857,9 +929,27 @@ export default function DashboardPage() {
             </div>
 
             <div>
-              <h2 className="text-lg font-bold mb-3">Renda Mensal</h2>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold">Renda Mensal</h2>
+                <div className="flex gap-1">
+                  {(["valor", "data"] as const).map((ordem) => (
+                    <button
+                      key={ordem}
+                      type="button"
+                      onClick={() => setOrdemRenda(ordem)}
+                      className="px-2 py-1 rounded text-xs transition-colors"
+                      style={{
+                        backgroundColor: ordemRenda === ordem ? "#3574b5" : "#2a2a2a",
+                        color: ordemRenda === ordem ? "#ffffff" : "#888888",
+                      }}
+                    >
+                      {ordem === "valor" ? "Por valor" : "Por data"}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="flex flex-col gap-3 max-h-72 overflow-y-auto scroll-azul pr-1">
-                {respostasComData.map((r) => {
+                {rendaOrdenada.map((r) => {
                   const expandido = rendaExpandido === r.id;
                   return (
                     <Card key={r.id} className="p-4">

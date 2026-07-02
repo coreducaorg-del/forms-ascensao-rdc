@@ -381,6 +381,7 @@ export default function DashboardPage() {
   const [buscaRanking, setBuscaRanking] = useState("");
   const [ordemInteresse, setOrdemInteresse] = useState<"resposta" | "data">("resposta");
   const [ordemRenda, setOrdemRenda] = useState<"valor" | "data">("valor");
+  const [buscaInvestir, setBuscaInvestir] = useState("");
 
   async function apagarResposta(resposta: Resposta) {
     setApagando(true);
@@ -506,6 +507,13 @@ export default function DashboardPage() {
     "Menos de R$ 1.000",
     "Sem Renda",
   ];
+  const investirFiltrado = useMemo(() => {
+    if (!buscaInvestir.trim()) return respostasComData;
+    return respostasComData.filter((r) =>
+      r.nome_completo.toLowerCase().includes(buscaInvestir.toLowerCase())
+    );
+  }, [respostasComData, buscaInvestir]);
+
   const rendaOrdenada = useMemo(() => {
     const items = [...respostasComData];
     if (ordemRenda === "data") {
@@ -986,9 +994,16 @@ export default function DashboardPage() {
             </div>
 
             <div>
-              <h2 className="text-lg font-bold mb-3">O que faria investir mais</h2>
+              <h2 className="text-lg font-bold mb-2">O que faria investir mais</h2>
+              <input
+                type="text"
+                value={buscaInvestir}
+                onChange={(e) => setBuscaInvestir(e.target.value)}
+                placeholder="Buscar por nome..."
+                className="w-full mb-3 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-1.5 text-sm text-white placeholder-[#555555] focus:outline-none focus:border-[#3574b5]"
+              />
               <div className="flex flex-col gap-3 max-h-72 overflow-y-auto scroll-azul pr-1">
-                {respostasComData.map((r) => {
+                {investirFiltrado.map((r) => {
                   const expandido = investirExpandido === r.id;
                   return (
                     <Card key={r.id} className="p-4">

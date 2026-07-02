@@ -780,7 +780,7 @@ function FormularioConteudo() {
 
             <div>
               <Label erro={camposComErro.has("prioridade_coreano")}>
-                De 0 a 10, o quanto aprender coreano é uma prioridade real na sua vida agora?
+                Hoje, de 0 a 10, o quanto aprender coreano é uma prioridade real na sua vida? (sinceridade)
               </Label>
               <div className={camposComErro.has("prioridade_coreano") ? "rounded-lg border border-[#ff5252] p-1" : ""}>
                 <div className="grid grid-cols-4 gap-2">

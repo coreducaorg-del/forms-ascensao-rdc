@@ -10,35 +10,39 @@ type Aba = "acessos" | "urgencia";
 // ── Score (mesma lógica do painel principal) ──────────────────────────────────
 
 function calculateScore(r: Resposta): number {
-  let score = 0;
-
-  // Interesse — 30 pts
-  if (r.interesse_curso_completo === "Sim, com certeza") score += 30;
-  else if (r.interesse_curso_completo === "Talvez, dependendo do valor") score += 20;
-
-  // Renda — 30 pts
+  const temPrioridade = r.prioridade_coreano !== null && r.prioridade_coreano !== undefined && r.prioridade_coreano !== "";
   const rendaAlta = ["Entre R$ 3.001 e R$ 4.000","Entre R$ 4.001 e R$ 5.000","Entre R$ 5.001 e R$ 10.000","Entre R$ 10.001 e R$ 20.000","Mais de R$ 20.001"];
   const rendaMedia = ["Entre R$ 1.001 e R$ 2.000","Entre R$ 2.001 e R$ 3.000"];
+  const idadeAlta = ["25-34","35-44","45-54","55-65","+65"];
+  const escolaridadeAlta = ["Ensino Superior Completo","Mestrado ou Doutorado Completo","Ensino Médio Completo"];
+
+  let score = 0;
+
+  // Interesse
+  if (r.interesse_curso_completo === "Sim, com certeza") score += temPrioridade ? 30 : 40;
+  else if (r.interesse_curso_completo === "Talvez, dependendo do valor") score += temPrioridade ? 20 : 30;
+
+  // Renda
   if (r.faixa_renda && rendaAlta.includes(r.faixa_renda)) score += 30;
   else if (r.faixa_renda && rendaMedia.includes(r.faixa_renda)) score += 20;
   else if (r.faixa_renda === "Menos de R$ 1.000" || r.faixa_renda === "Sem Renda") score += 5;
 
-  // Prioridade coreano — 20 pts
-  const p = Number(r.prioridade_coreano ?? 0);
-  if (p >= 9) score += 20;
-  else if (p >= 7) score += 15;
-  else if (p >= 5) score += 8;
-  else if (p >= 3) score += 3;
+  // Prioridade coreano (só para respostas novas)
+  if (temPrioridade) {
+    const p = Number(r.prioridade_coreano);
+    if (p >= 9) score += 20;
+    else if (p >= 7) score += 15;
+    else if (p >= 5) score += 8;
+    else if (p >= 3) score += 3;
+  }
 
-  // Faixa etária — 10 pts
-  const idadeAlta = ["25-34","35-44","45-54","55-65","+65"];
-  if (r.faixa_etaria && idadeAlta.includes(r.faixa_etaria)) score += 10;
-  else if (r.faixa_etaria === "18-24") score += 6;
-  else if (r.faixa_etaria === "13-17") score += 2;
+  // Faixa etária
+  if (r.faixa_etaria && idadeAlta.includes(r.faixa_etaria)) score += temPrioridade ? 10 : 15;
+  else if (r.faixa_etaria === "18-24") score += temPrioridade ? 6 : 10;
+  else if (r.faixa_etaria === "13-17") score += temPrioridade ? 2 : 5;
 
-  // Escolaridade — 10 pts
-  const escolaridadeAlta = ["Ensino Superior Completo","Mestrado ou Doutorado Completo","Ensino Médio Completo"];
-  if (r.escolaridade && escolaridadeAlta.includes(r.escolaridade)) score += 10;
+  // Escolaridade
+  if (r.escolaridade && escolaridadeAlta.includes(r.escolaridade)) score += temPrioridade ? 10 : 15;
   else if (r.escolaridade === "Ensino Fundamental Completo") score += 5;
 
   return score;

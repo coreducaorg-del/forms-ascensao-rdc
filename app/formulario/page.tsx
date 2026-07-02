@@ -746,39 +746,6 @@ function FormularioConteudo() {
             </div>
 
             <div>
-              <Label erro={camposComErro.has("interesse_curso_completo")}>
-                Este mini-curso é um ótimo primeiro passo para a fluência.. Mas se existisse um caminho
-                completo, com professor e acompanhamento, pra te levar do zero à fluência.. você teria
-                interesse em conhecer?
-              </Label>
-              <div className={camposComErro.has("interesse_curso_completo") ? "rounded-lg border border-[#ff5252] p-1" : ""}>
-                <ChoiceButtons
-                  options={[
-                    "Sim, com certeza",
-                    "Talvez, dependendo do valor",
-                    "Por enquanto só o mini-curso me basta",
-                  ]}
-                  selected={formData.interesse_curso_completo}
-                  onSelect={(v) => set("interesse_curso_completo", v)}
-                />
-              </div>
-              {camposComErro.has("interesse_curso_completo") && <p className="text-[#ff5252] text-xs mt-1">* Campo obrigatório</p>}
-            </div>
-
-            <div>
-              <Label erro={camposComErro.has("o_que_faria_investir")}>
-                O que faria você investir mais para aprender coreano de forma completa? (o que tem não
-                pode faltar na entrega)
-              </Label>
-              <textarea
-                value={formData.o_que_faria_investir}
-                onChange={(e) => set("o_que_faria_investir", e.target.value)}
-                rows={4}
-                className={inputClass("o_que_faria_investir")}
-              />
-            </div>
-
-            <div>
               <Label erro={camposComErro.has("prioridade_coreano")}>
                 Hoje, de 0 a 10, o quanto aprender coreano é uma prioridade real na sua vida? (sinceridade)
               </Label>
@@ -826,6 +793,39 @@ function FormularioConteudo() {
                 />
               </div>
             )}
+
+            <div>
+              <Label erro={camposComErro.has("interesse_curso_completo")}>
+                Este mini-curso é um ótimo primeiro passo para a fluência.. Mas se existisse um caminho
+                completo, com professor e acompanhamento, pra te levar do zero à fluência.. você teria
+                interesse em conhecer?
+              </Label>
+              <div className={camposComErro.has("interesse_curso_completo") ? "rounded-lg border border-[#ff5252] p-1" : ""}>
+                <ChoiceButtons
+                  options={[
+                    "Sim, com certeza",
+                    "Talvez, dependendo do valor",
+                    "Por enquanto só o mini-curso me basta",
+                  ]}
+                  selected={formData.interesse_curso_completo}
+                  onSelect={(v) => set("interesse_curso_completo", v)}
+                />
+              </div>
+              {camposComErro.has("interesse_curso_completo") && <p className="text-[#ff5252] text-xs mt-1">* Campo obrigatório</p>}
+            </div>
+
+            <div>
+              <Label erro={camposComErro.has("o_que_faria_investir")}>
+                O que faria você investir mais para aprender coreano de forma completa? (o que tem não
+                pode faltar na entrega)
+              </Label>
+              <textarea
+                value={formData.o_que_faria_investir}
+                onChange={(e) => set("o_que_faria_investir", e.target.value)}
+                rows={4}
+                className={inputClass("o_que_faria_investir")}
+              />
+            </div>
           </div>
         )}
 

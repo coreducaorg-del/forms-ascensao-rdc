@@ -82,30 +82,33 @@ const PERGUNTAS_RESPOSTAS: PerguntaResposta[] = [
   },
 ];
 
+const RENDA_ALTA = [
+  "Entre R$ 3.001 e R$ 4.000",
+  "Entre R$ 4.001 e R$ 5.000",
+  "Entre R$ 5.001 e R$ 10.000",
+  "Entre R$ 10.001 e R$ 20.000",
+  "Mais de R$ 20.001",
+];
+const RENDA_MEDIA = ["Entre R$ 1.001 e R$ 2.000", "Entre R$ 2.001 e R$ 3.000"];
+const IDADE_ALTA = ["25-34", "35-44", "45-54", "55-65", "+65"];
+
 function pontosInteresse(r: Resposta): number {
-  if (r.interesse_curso_completo === "Sim, com certeza") return 30;
-  if (r.interesse_curso_completo === "Talvez, dependendo do valor") return 20;
+  const temPrioridade = r.prioridade_coreano !== null && r.prioridade_coreano !== undefined && r.prioridade_coreano !== "";
+  if (r.interesse_curso_completo === "Sim, com certeza") return temPrioridade ? 30 : 40;
+  if (r.interesse_curso_completo === "Talvez, dependendo do valor") return temPrioridade ? 20 : 30;
   return 0;
 }
 
 function pontosRenda(r: Resposta): number {
-  const rendaAlta = [
-    "Entre R$ 3.001 e R$ 4.000",
-    "Entre R$ 4.001 e R$ 5.000",
-    "Entre R$ 5.001 e R$ 10.000",
-    "Entre R$ 10.001 e R$ 20.000",
-    "Mais de R$ 20.001",
-  ];
-  const rendaMedia = ["Entre R$ 1.001 e R$ 2.000", "Entre R$ 2.001 e R$ 3.000"];
-
-  if (r.faixa_renda && rendaAlta.includes(r.faixa_renda)) return 30;
-  if (r.faixa_renda && rendaMedia.includes(r.faixa_renda)) return 20;
+  if (r.faixa_renda && RENDA_ALTA.includes(r.faixa_renda)) return 30;
+  if (r.faixa_renda && RENDA_MEDIA.includes(r.faixa_renda)) return 20;
   if (r.faixa_renda === "Menos de R$ 1.000" || r.faixa_renda === "Sem Renda") return 5;
   return 0;
 }
 
 function pontosPrioridade(r: Resposta): number {
-  const p = Number(r.prioridade_coreano ?? 0);
+  if (!r.prioridade_coreano) return 0;
+  const p = Number(r.prioridade_coreano);
   if (p >= 9) return 20;
   if (p >= 7) return 15;
   if (p >= 5) return 8;
@@ -114,20 +117,17 @@ function pontosPrioridade(r: Resposta): number {
 }
 
 function pontosIdade(r: Resposta): number {
-  const idadeAlta = ["25-34", "35-44", "45-54", "55-65", "+65"];
-  if (r.faixa_etaria && idadeAlta.includes(r.faixa_etaria)) return 10;
-  if (r.faixa_etaria === "18-24") return 6;
-  if (r.faixa_etaria === "13-17") return 2;
+  const temPrioridade = r.prioridade_coreano !== null && r.prioridade_coreano !== undefined && r.prioridade_coreano !== "";
+  if (r.faixa_etaria && IDADE_ALTA.includes(r.faixa_etaria)) return temPrioridade ? 10 : 15;
+  if (r.faixa_etaria === "18-24") return temPrioridade ? 6 : 10;
+  if (r.faixa_etaria === "13-17") return temPrioridade ? 2 : 5;
   return 0;
 }
 
 function pontosEscolaridade(r: Resposta): number {
-  const escolaridadeAlta = [
-    "Ensino Superior Completo",
-    "Mestrado ou Doutorado Completo",
-    "Ensino Médio Completo",
-  ];
-  if (r.escolaridade && escolaridadeAlta.includes(r.escolaridade)) return 10;
+  const temPrioridade = r.prioridade_coreano !== null && r.prioridade_coreano !== undefined && r.prioridade_coreano !== "";
+  const escolaridadeAlta = ["Ensino Superior Completo", "Mestrado ou Doutorado Completo", "Ensino Médio Completo"];
+  if (r.escolaridade && escolaridadeAlta.includes(r.escolaridade)) return temPrioridade ? 10 : 15;
   if (r.escolaridade === "Ensino Fundamental Completo") return 5;
   return 0;
 }
